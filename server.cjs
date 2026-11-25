@@ -32,6 +32,7 @@ const files = new Map([
   ['/detection.js', ['detection.js', 'text/javascript; charset=utf-8']],
   ['/diagnosis.js', ['diagnosis.js', 'text/javascript; charset=utf-8']],
   ['/intervention.js', ['intervention.js', 'text/javascript; charset=utf-8']],
+  ['/subjects.js', ['subjects.js', 'text/javascript; charset=utf-8']],
 ]);
 
 if (!key) throw new Error('Set EDUMIND_DETECTION_KEY to the n8n Header Auth value.');

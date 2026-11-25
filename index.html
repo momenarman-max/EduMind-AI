@@ -284,7 +284,7 @@
       display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px;
       margin-block: -6px 18px; font-size: 14px; font-weight: 750;
     }
-    .student-switch select { width: auto; max-width: 100%; min-width: 145px; }
+    .student-switch select { text-overflow: ellipsis; width: auto; max-width: 100%; min-width: 145px; }
     .student-form { margin-block-start: 12px; }
     .student-form fieldset { min-width: 0; margin: 0; border: 1px solid var(--line); border-radius: 10px; padding: 11px; }
     .student-form legend { padding-inline: 4px; font-size: 14px; font-weight: 750; }
@@ -400,7 +400,7 @@
     <div class="intro">
       <div class="intro-copy">
         <h1 id="heading" tabindex="-1">لوحة المعلّم لمتابعة تقدّم الطلاب</h1>
-        <p id="introduction">أدخل علامات الرياضيات وأيام الحضور لكل طالب. تساعدك اللوحة على اكتشاف التراجع، وتقترح خطة دعم لثمانية أسابيع تتابع أثرها أسبوعًا بأسبوع.</p>
+        <p id="introduction">اختر طالبًا ومادة، أو أضف أي مادة. سجّل العلامات والحضور، وشغّل التحليل، وتابع خطة الدعم على مدى ثمانية أسابيع.</p>
         <div class="cover-actions">
           <a class="button" id="jump-workspace" href="#workspace-start" data-copy="openWorkspace">افتح لوحة المعلّم</a>
           <a href="#students/new" data-copy="addStudent">إضافة طالب</a>
@@ -430,10 +430,30 @@
     <div id="workspace-start" tabindex="-1"></div>
 
     <div class="student-switch" id="student-switch">
+      <label for="subject-picker" data-copy="subject">المادة</label>
+      <select id="subject-picker"></select>
+      <button class="button subtle" id="add-subject" type="button" data-copy="addSubject">إضافة مادة</button>
       <label for="student-picker" data-copy="activeStudent">الطالب الحالي</label>
       <select id="student-picker"></select>
       <a href="#students/new" data-copy="addStudent">إضافة طالب</a>
     </div>
+
+    <dialog class="card student-dialog" id="subject-dialog" aria-labelledby="subject-title">
+      <div class="dialog-heading">
+        <h2 id="subject-title" data-copy="addSubject">إضافة مادة</h2>
+        <button class="dialog-close" id="close-subject" type="button" data-label="closeDialog">×</button>
+      </div>
+      <form class="student-form" id="subject-form">
+        <label><span data-copy="subjectName">اسم المادة</span><input id="subject-name" dir="auto" required maxlength="80"></label>
+        <p id="subject-error" class="form-error" role="alert"></p>
+        <button class="button" data-copy="addSubject">إضافة مادة</button>
+      </form>
+    </dialog>
+    <section class="card" id="empty-subject" aria-labelledby="empty-subject-title" hidden>
+      <h2 id="empty-subject-title" data-copy="emptySubject">لا توجد قياسات لهذه المادة</h2>
+      <p id="empty-subject-note"></p>
+      <a class="button" id="enter-baseline" href="#students/baseline"></a>
+    </section>
 
     <section class="card integration" id="integration" aria-labelledby="integration-title">
       <div class="integration-header">
@@ -490,7 +510,7 @@
         </div>
         <div class="metrics">
           <div class="metric">
-            <p data-copy="math">علامة الرياضيات</p>
+            <p data-copy="math">العلامة</p>
             <strong><bdi id="score">54</bdi> <small data-copy="scoreUnit">من 100</small></strong>
             <small id="scoreChange">العلامة السابقة 82</small>
           </div>
@@ -506,7 +526,7 @@
       </section>
 
       <section class="card trend" aria-labelledby="trend">
-        <div class="section-head"><h2 id="trend" data-copy="trend">أداء الرياضيات</h2><p data-copy="outOf">من 100</p></div>
+        <div class="section-head"><h2 id="trend" data-copy="trend">تطوّر الأداء</h2><p data-copy="outOf">من 100</p></div>
         <div class="chart" id="chart">
           <button class="chart-point" type="button" aria-pressed="false">
             <span class="plot"><span class="bar" id="previous-bar" style="--score:82">82</span></span>
@@ -554,25 +574,28 @@
           <h2 id="new-student-heading" data-copy="addStudent">إضافة طالب</h2>
           <button type="button" class="dialog-close" data-close="student-entry" data-label="closeDialog" aria-label="إغلاق">×</button>
         </div>
+        <p class="form-hint" id="entry-subject" dir="auto"></p>
         <form class="student-form" id="student-form" aria-describedby="measurement-help">
-          <label><span data-copy="studentCode">رمز الطالب</span><input id="new-code" dir="ltr" type="text" minlength="3" maxlength="24" pattern="[A-Za-z0-9_\-]{3,24}" placeholder="S-001" autocomplete="off" required></label>
+          <label id="entry-code-label"><span data-copy="studentCode">رمز الطالب</span><input id="new-code" dir="ltr" type="text" minlength="3" maxlength="24" pattern="[A-Za-z0-9_\-]{3,24}" placeholder="S-001" autocomplete="off" required></label>
           <p class="form-hint" id="measurement-help" data-copy="measurementHelp">خذ العلامة من اختبار قصير على المقياس نفسه، والحضور من سجلّ الأسبوع. 12 من 15 تساوي 80 من 100.</p>
           <fieldset><legend data-copy="previous">القياس السابق</legend>
             <div class="checkpoint-fields">
-              <label><span data-copy="math">علامة الرياضيات</span><input id="new-previous-score" type="number" min="0" max="100" step="1" required></label>
+              <label><span data-copy="math">العلامة</span><input id="new-previous-score" type="number" min="0" max="100" step="1" required></label>
               <label><span data-copy="attendance">الحضور الأسبوعي</span><input id="new-previous-days" type="number" min="0" max="5" step="1" required></label>
             </div>
           </fieldset>
           <fieldset><legend data-copy="baseline">خط الأساس</legend>
             <div class="checkpoint-fields">
-              <label><span data-copy="math">علامة الرياضيات</span><input id="new-current-score" type="number" min="0" max="100" step="1" required></label>
+              <label><span data-copy="math">العلامة</span><input id="new-current-score" type="number" min="0" max="100" step="1" required></label>
               <label><span data-copy="attendance">الحضور الأسبوعي</span><input id="new-current-days" type="number" min="0" max="5" step="1" required></label>
             </div>
           </fieldset>
           <fieldset><legend data-copy="optionalEvidence">أدلة اختيارية للتشخيص</legend>
             <div class="checkpoint-fields">
-              <label><span data-copy="quizCorrect">إجابات الكسور الصحيحة</span><input id="new-quiz-correct" type="number" min="0" max="100" step="1"></label>
-              <label><span data-copy="quizTotal">عدد أسئلة اختبار الكسور</span><input id="new-quiz-total" type="number" min="1" max="100" step="1"></label>
+              <label class="quiz-field"><span data-copy="quizCorrect">إجابات الكسور الصحيحة</span><input id="new-quiz-correct" type="number" min="0" max="100" step="1"></label>
+              <label class="quiz-field"><span data-copy="quizTotal">عدد أسئلة اختبار الكسور</span><input id="new-quiz-total" type="number" min="1" max="100" step="1"></label>
+              <label class="academic-field"><span data-copy="skill">المهارة التي تحتاج إلى دعم</span><input id="new-skill" maxlength="160" dir="auto"></label>
+              <label class="academic-field"><span data-copy="exercise">تمرين مقترح</span><input id="new-exercise" maxlength="280" dir="auto"></label>
               <label><span data-copy="busDays">أيام الغياب المتزامنة مع تأخّر الحافلة</span><input id="new-bus" type="number" min="0" max="5" step="1"></label>
             </div>
           </fieldset>
@@ -587,7 +610,7 @@
         </div>
         <p class="form-hint" id="profile-progress"></p>
         <div class="comparison">
-          <div><p data-copy="math">علامة الرياضيات</p><strong id="profile-score"></strong></div>
+          <div><p data-copy="math">العلامة</p><strong id="profile-score"></strong></div>
           <div><p data-copy="attendance">الحضور الأسبوعي</p><strong id="profile-days"></strong></div>
         </div>
         <button class="button" type="button" id="open-profile" data-copy="openProfile">افتح بطاقة الطالب</button>
@@ -614,6 +637,14 @@
             </details>
           </li>
           <li data-resource="review-checklist" data-copy="reviewChecklist">راجع آخر اختبار وحدّد سؤالًا يحتاج الطالب إلى إعادة حلّه.</li>
+          <li data-resource="subject-exercise">
+            <p id="exercise-guidance" dir="auto"></p>
+            <form class="student-form" id="exercise-form">
+              <label><span data-copy="exercise">تمرين مقترح</span><input id="edit-exercise" maxlength="280" dir="auto"></label>
+              <button class="button subtle" data-copy="saveExercise">حفظ التمرين</button>
+              <p id="exercise-status" role="status"></p>
+            </form>
+          </li>
         </ul>
       </section>
     </section>
@@ -625,7 +656,7 @@
         <a class="button subtle" id="backToWorkflow" href="#workflow" data-copy="openWorkflow">انتقل إلى مسار الوكلاء</a>
         <form class="checkpoint-form" id="checkpoint-form" hidden>
           <div class="checkpoint-fields">
-            <label><span data-copy="math">علامة الرياضيات</span><input id="checkpoint-score" type="number" min="0" max="100" step="1" required></label>
+            <label><span data-copy="math">العلامة</span><input id="checkpoint-score" type="number" min="0" max="100" step="1" required></label>
             <label><span data-copy="attendance">الحضور الأسبوعي</span><input id="checkpoint-attendance" type="number" min="0" max="5" step="1" required></label>
           </div>
           <p class="form-hint" id="checkpoint-source"></p>
@@ -636,7 +667,7 @@
         <section class="card report" aria-labelledby="comparison">
           <div class="section-head"><h2 id="comparison" tabindex="-1"></h2><p id="evaluation-source"></p></div>
           <div class="comparison">
-            <div><p data-copy="math">علامة الرياضيات</p><strong><bdi id="math-comparison"></bdi></strong><small id="math-delta"></small></div>
+            <div><p data-copy="math">العلامة</p><strong><bdi id="math-comparison"></bdi></strong><small id="math-delta"></small></div>
             <div><p data-copy="attendance">الحضور الأسبوعي</p><strong><bdi id="attendance-comparison"></bdi></strong><small id="attendance-delta"></small></div>
           </div>
           <a class="button subtle" href="#overview" data-copy="openOverview">العودة إلى النظرة العامة</a>
@@ -656,7 +687,7 @@
       <img src="academic-support.webp" alt="" width="1500" height="1000" loading="lazy">
       <section aria-labelledby="about-usage">
         <h2 id="about-usage" data-copy="aboutUsage">كيف يساعد المعلّم؟</h2>
-        <p data-copy="aboutDetails">يسجّل المعلّم علامات الرياضيات وأيام الحضور لكل طالب. تُظهر اللوحة التغيّر في النتائج وتقترح تمارين وجلسات دعم على مدى ثمانية أسابيع. يراجع المعلّم الاقتراحات ويختار ما يناسب الطالب، ثم يقارن نتائجه كل أسبوع.</p>
+        <p data-copy="aboutDetails">لكل طالب ملف واحد. تُحفظ العلامات والحضور والأدلة والتمارين والقياسات الأسبوعية لكل مادة على حدة. اقترح تمرينًا يناسب المادة وقارن النتائج بخط الأساس على مدى ثمانية أسابيع.</p>
         <div class="actions">
           <a class="button" href="#overview" data-copy="aboutDemo">افتح لوحة المشروع</a>
           <a class="button subtle" href="https://github.com/momenarman-max/EduMind-AI" data-copy="aboutRepository">كود المشروع على GitHub</a>
@@ -666,11 +697,11 @@
       <div class="about-notes">
         <section aria-labelledby="about-try">
           <h2 id="about-try" data-copy="aboutTry">جرّب بحالة آدم</h2>
-          <p data-copy="aboutTryText">افتح اللوحة وشغّل التحليل على حالة آدم التجريبية. راجع خطة الدعم، ثم أدخل علامة وحضورًا جديدين في «المتابعة» لترى الفرق عن قياس البداية.</p>
+          <p data-copy="aboutTryText">اختر الرياضيات وشغّل التحليل على حالة آدم التجريبية. راجع خطة الدعم، ثم أدخل علامة وحضورًا جديدين في «المتابعة» لترى الفرق عن قياس البداية.</p>
         </section>
         <section aria-labelledby="about-tech">
           <h2 id="about-tech" data-copy="aboutTech">التقنيات وطريقة التشغيل</h2>
-          <p data-copy="aboutTechText">تعمل اللوحة في المتصفح بثلاث لغات، وتُحفظ الإدخالات محليًا في النسخة الثابتة. يدعم خادم Node.js ربط n8n وGoogle Sheets وOpenAI عند إعداد مفاتيح الاتصال على الخادم.</p>
+          <p data-copy="aboutTechText">يعمل هذا العرض في المتصفح بالعربية والإنجليزية والأوكرانية. تبقى رموز الطلاب وقياسات المواد والتمارين في المتصفح الذي أُدخلت فيه.</p>
           <a href="https://github.com/momenarman-max/EduMind-AI/blob/main/n8n/README.md" data-copy="aboutDocs">دليل تشغيل المشروع</a>
         </section>
       </div>
@@ -680,28 +711,29 @@
   <script src="detection.js"></script>
   <script src="diagnosis.js"></script>
   <script src="intervention.js"></script>
+  <script src="subjects.js"></script>
   <script>
     const copy = {
       ar: {
         skip: 'انتقل إلى المحتوى', language: 'لغة الواجهة', navigation: 'أقسام اللوحة',
         demo: 'بيانات تجريبية', overview: 'نظرة عامة', workflow: 'مسار الوكلاء', followup: 'المتابعة',
         about: 'عن المشروع',
-        aboutIntro: 'EduMind AI مشروع أكاديمي يساعد المعلّمين على اكتشاف تراجع الطلاب في الرياضيات مبكرًا ومتابعة أثر الدعم مع الوقت.',
+        aboutIntro: 'EduMind AI مشروع أكاديمي يساعد المعلّمين على اكتشاف تراجع الطلاب في أي مادة مبكرًا ومتابعة أثر الدعم مع الوقت.',
         aboutUsage: 'كيف يساعد المعلّم؟',
-        aboutDetails: 'يسجّل المعلّم علامات الرياضيات وأيام الحضور لكل طالب. تُظهر اللوحة التغيّر في النتائج وتقترح تمارين وجلسات دعم على مدى ثمانية أسابيع. يراجع المعلّم الاقتراحات ويختار ما يناسب الطالب، ثم يقارن نتائجه كل أسبوع.',
+        aboutDetails: 'لكل طالب ملف واحد. تُحفظ العلامات والحضور والأدلة والتمارين والقياسات الأسبوعية لكل مادة على حدة. اقترح تمرينًا يناسب المادة وقارن النتائج بخط الأساس على مدى ثمانية أسابيع.',
         aboutRepository: 'كود المشروع على GitHub',
         aboutDemo: 'افتح لوحة المشروع',
         aboutTry: 'جرّب بحالة آدم',
-        aboutTryText: 'افتح اللوحة وشغّل التحليل على حالة آدم التجريبية. راجع خطة الدعم، ثم أدخل علامة وحضورًا جديدين في «المتابعة» لترى الفرق عن قياس البداية.',
+        aboutTryText: 'اختر الرياضيات وشغّل التحليل على حالة آدم التجريبية. راجع خطة الدعم، ثم أدخل علامة وحضورًا جديدين في «المتابعة» لترى الفرق عن قياس البداية.',
         aboutTech: 'التقنيات وطريقة التشغيل',
-        aboutTechText: 'تعمل اللوحة في المتصفح بثلاث لغات، وتُحفظ الإدخالات محليًا في النسخة الثابتة. يدعم خادم Node.js ربط n8n وGoogle Sheets وOpenAI عند إعداد مفاتيح الاتصال على الخادم.',
+        aboutTechText: 'يعمل هذا العرض في المتصفح بالعربية والإنجليزية والأوكرانية. تبقى رموز الطلاب وقياسات المواد والتمارين في المتصفح الذي أُدخلت فيه.',
         aboutDocs: 'دليل تشغيل المشروع',
         coverHeading: "لوحة المعلّم لمتابعة تقدّم الطلاب",
         openWorkspace: "افتح لوحة المعلّم",
         closeDialog: "إغلاق النافذة",
         chapterControls: "صور مراحل المتابعة",
         guideTitle: "كيف تستخدم اللوحة؟",
-        coverCaptions: ["تصحيح اختبار الرياضيات ومراجعة الحضور.", "شرح الكسور للطالب والتمرّن معًا.", "مقارنة نتائج الطالب من أسبوع إلى آخر."],
+        coverCaptions: ["تصحيح اختبار ومراجعة الحضور.", "شرح مهارة للطالب والتمرّن معًا.", "مقارنة نتائج الطالب من أسبوع إلى آخر."],
         searchStudents: "ابحث باسم الحالة أو رمز الطالب",
         rosterViews: "عرض سجل الطلاب",
         galleryView: "البطاقات",
@@ -709,7 +741,7 @@
         indexView: "الفهرس",
         openProfile: "افتح بطاقة الطالب",
         noSearchResults: "ما في نتائج لهذا البحث.",
-        coverChapters: [["القياس","اختر طالبًا وسجّل علاماته في الرياضيات وأيام حضوره. تعرض اللوحة مقدار التغيّر بين القياسات."],["الدعم","شغّل التحليل لعرض جوانب الصعوبة المحتملة وخطة مقترحة فيها جلسات وتمارين."],["المتابعة","أدخل العلامة والحضور من جديد كل أسبوع. قارن النتيجة بقياس البداية وراجع ما يحتاج إلى دعم إضافي."]],
+        coverChapters: [["القياس","اختر طالبًا ومادة وسجّل علاماته وأيام حضوره. تعرض اللوحة مقدار التغيّر بين القياسات."],["الدعم","شغّل التحليل لعرض جوانب الصعوبة المحتملة وخطة مقترحة فيها جلسات وتمارين."],["المتابعة","أدخل العلامة والحضور من جديد كل أسبوع. قارن النتيجة بقياس البداية وراجع ما يحتاج إلى دعم إضافي."]],
         workflowMap: 'شاهد مخطط n8n',
         hostedMode: ['تشغيل متصفحي', 'تعمل قواعد الوكلاء في هذا المتصفح. القياسات المدخلة تبقى فيه.'],
         loadShared: "تحميل سجل Google Sheets",
@@ -787,7 +819,7 @@
         roadmapReady: 'سجّل قياسات الأسبوع ثم قيّمها لتحديث خطة المتابعة.',
         roadmapComplete: "اكتملت متابعة 8 أسابيع.",
         evaluating: "جارٍ تقييم الأسبوع…", evaluationError: "تعذّر تقييم هذا الأسبوع. أعد المحاولة.",
-        evaluationResult: (score, days) => 'الرياضيات ' + score + ' من 100، والحضور ' + days + ' من 5 أيام.',
+        evaluationResult: (score, days) => 'العلامة ' + score + ' من 100، والحضور ' + days + ' من 5 أيام.',
         sinceDetection: 'التغيّر منذ الرصد',
         connection: {
           ready: ['وضع n8n', 'شغّل التحليل لعرض الرصد والتشخيص وخطة التدخّل والموارد.'],
@@ -796,12 +828,12 @@
           local: ['عرض محلي', 'يعمل الحساب في المتصفح. افتح اللوحة المتصلة لتشغيل المسار عبر n8n.'],
           error: ['تعذّر تنفيذ التحليل', 'لم تصل نتيجة صالحة من n8n. أعد تشغيل التحليل للمحاولة مرة أخرى.'],
         },
-        heading: 'لوحة المعلّم', overviewIntro: 'أدخل علامات الرياضيات وأيام الحضور لكل طالب. تساعدك اللوحة على اكتشاف التراجع، وتقترح خطة دعم لثمانية أسابيع تتابع أثرها أسبوعًا بأسبوع.',
+        heading: 'لوحة المعلّم', overviewIntro: 'اختر طالبًا ومادة، أو أضف أي مادة. سجّل العلامات والحضور، وشغّل التحليل، وتابع خطة الدعم على مدى ثمانية أسابيع.',
         workflowIntro: 'اختر أي وكيل للاطّلاع على مهمته ونتيجة عمله.',
         followupIntro: 'تابع العلامة والحضور أسبوعيًا واضبط خطة الدعم حسب النتائج.',
         caseLabel: 'حالة الطالب', student: 'آدم خليل', initials: 'آخ', grade: 'الصف الثامن',
         risks: { pending: 'بانتظار تقييم الخطر', high: 'خطر مرتفع عند الرصد', watch: 'يحتاج إلى متابعة', low: 'خطر منخفض وفق قواعد الرصد' },
-        detectionResult: (math, attendance, risk) => 'تغيّر علامة الرياضيات: ' + math + ' نقطة. تغيّر الحضور: ' + attendance + ' يوم. ' + risk + '.',
+        detectionResult: (math, attendance, risk) => 'تغيّر العلامة: ' + math + ' نقطة. تغيّر الحضور: ' + attendance + ' يوم. ' + risk + '.',
         fractionClue: (correct, total) => 'كانت الإجابات الصحيحة ' + correct + ' من ' + total + ' في اختبار الكسور. تشير النتيجة إلى حاجة لدعم في الكسور.',
         learningAssessment: {
           'no-signal': 'لم تُشر نتيجة اختبار الكسور إلى حاجة لدعم إضافي في هذا التقييم.',
@@ -814,10 +846,10 @@
           unknown: 'لا توجد بيانات نقل لهذه الحالة.',
           skipped: '',
         },
-        math: 'علامة الرياضيات', attendance: 'الحضور الأسبوعي',
+        math: 'العلامة', attendance: 'الحضور الأسبوعي',
         scoreUnit: 'من 100', daysUnit: 'من 5 أيام', scoreBefore: score => 'العلامة السابقة ' + score,
         daysBefore: days => 'الحضور السابق ' + days + ' من 5 أيام',
-        trend: 'أداء الرياضيات', outOf: 'من 100', previous: 'القياس السابق', detected: 'عند الرصد',
+        trend: 'تطوّر الأداء', outOf: 'من 100', previous: 'القياس السابق', detected: 'عند الرصد',
         latestMeasurement: 'آخر قياس', casePath: 'مراحل الحالة', stages: 'مراحل التحليل',
         run: 'تشغيل تحليل الوكلاء', running: 'التحليل جارٍ…', replay: 'إعادة تشغيل التحليل',
         openFollowup: 'افتح خطة 8 أسابيع', openWorkflow: 'انتقل إلى مسار الوكلاء',
@@ -831,7 +863,7 @@
         ready: 'اكتمل التحليل. خطة الدعم لثمانية أسابيع جاهزة.',
         agents: [
           ['رصد التراجع', 'يقارن العلامة والحضور بين الأسبوعين ويحسب مستوى الخطر وفق قواعد الديمو.'],
-          ['تشخيص الحالة', 'يستخدم نتيجة الرصد وبيانات اختبار الكسور والنقل لتحديد ما يحتاج إلى متابعة.'],
+          ['تشخيص الحالة', 'يستخدم نتيجة الرصد وأدلة المهارة والحضور والنقل لتحديد ما يحتاج إلى متابعة.'],
           ['تخطيط التدخّل', 'يضع جدولًا لجلسات الدعم بناءً على التشخيص.'],
           ['اختيار الموارد', 'يقترح مواد تدريبية تناسب خطة الدعم.'],
           ['تقييم الأثر', 'يقارن القياس الأسبوعي ببيانات الرصد ويحدّث خطة الدعم.']
@@ -839,15 +871,15 @@
       },
       en: {
         about: 'About the project',
-        aboutIntro: 'EduMind AI is an academic project that helps teachers spot setbacks in mathematics early and see how students respond to support over time.',
+        aboutIntro: 'EduMind AI is an academic project that helps teachers spot setbacks in any subject early and see how students respond to support over time.',
         aboutUsage: 'How does it help teachers?',
-        aboutDetails: 'Teachers record each student’s math scores and attendance. The dashboard shows what changed and suggests eight weeks of exercises and support sessions. Teachers review the suggestions, choose what fits each student, and compare results each week.',
+        aboutDetails: 'Each student has one profile. Scores, attendance, evidence, exercises, and weekly measurements are saved separately for each subject. Choose an exercise that fits the subject and compare results to the baseline over eight weeks.',
         aboutRepository: 'Project code on GitHub',
         aboutDemo: 'Open the project dashboard',
         aboutTry: 'Try the sample student case',
-        aboutTryText: 'Open the dashboard and run the analysis on the sample student. Review the support plan, then enter a new score and attendance in Follow up to see how they compare with the starting point.',
+        aboutTryText: 'Select Mathematics and run the analysis on the sample student. Review the support plan, then enter a new score and attendance in Follow up to see how they compare with the starting point.',
         aboutTech: 'Technology and setup',
-        aboutTechText: 'The dashboard runs in the browser in three languages. The static edition saves entries locally. Configure credentials on the Node.js server to connect n8n, Google Sheets, and OpenAI.',
+        aboutTechText: 'This public demo runs in the browser in Arabic, English, and Ukrainian. Student codes, subject measurements, and exercises stay in the browser where they were entered.',
         aboutDocs: 'Project setup guide',
         skip: 'Skip to content', language: 'Interface language', navigation: 'Dashboard sections',
         demo: 'Demo data', overview: 'Overview', workflow: 'Agent workflow', followup: 'Follow-up',
@@ -856,7 +888,7 @@
         closeDialog: "Close dialog",
         chapterControls: "Images of each workflow step",
         guideTitle: "How the dashboard works",
-        coverCaptions: ["Marking a math quiz and checking attendance.", "Working through fractions with a student.", "Comparing a student’s results week by week."],
+        coverCaptions: ["Marking a quiz and checking attendance.", "Practicing a skill with a student.", "Comparing a student’s results week by week."],
         searchStudents: "Search by case name or student code",
         rosterViews: "Student directory views",
         galleryView: "Cards",
@@ -864,7 +896,7 @@
         indexView: "Index",
         openProfile: "Open student dashboard",
         noSearchResults: "No cases match this search.",
-        coverChapters: [["Measure","Choose a student and log their math scores and days attended. The dashboard shows what changed between entries."],["Support","Run the analysis to see where the student may be struggling and get a suggested plan with sessions and exercises."],["Follow up","Enter updated scores and attendance each week. Compare them with the starting point and review where the student needs more support."]],
+        coverChapters: [["Measure","Choose a student and a subject, then log scores and days attended. The dashboard shows what changed between entries."],["Support","Run the analysis to see where the student may be struggling and get a suggested plan with sessions and exercises."],["Follow up","Enter updated scores and attendance each week. Compare them with the starting point and review where the student needs more support."]],
         workflowMap: 'View the n8n workflow',
         hostedMode: ['Browser mode', 'Agent rules run in this browser. Measurements are kept here.'],
         loadShared: "Load Google Sheets roster",
@@ -926,7 +958,7 @@
         planFocus: {
           fractions: 'Practice finding common denominators and adding fractions.',
           review: 'Review errors on the latest quiz and identify the skill that needs support.',
-          monitor: 'Check the math score and attendance at the next measurement.',
+          monitor: 'Check the score and attendance at the next measurement.',
           'word-problems': 'Focus the next support sessions on word problems that involve adding fractions.',
           'mixed-review': "Review a mixed set of fraction problems and practice recurring errors.",
           independent: "Solve a set of problems independently and explain the method.",
@@ -942,7 +974,7 @@
         roadmapReady: 'Record this week’s measurements, then evaluate them to update the support plan.',
         roadmapComplete: "All 8 weeks of follow-up are complete.",
         evaluating: "Evaluating the week…", evaluationError: "The weekly evaluation failed. Try again.",
-        evaluationResult: (score, days) => 'Math: ' + score + ' out of 100. Attendance: ' + days + ' out of 5 days.',
+        evaluationResult: (score, days) => 'Score: ' + score + ' out of 100. Attendance: ' + days + ' out of 5 days.',
         sinceDetection: 'Change since detection',
         connection: {
           ready: ['n8n mode', 'Run the analysis to see detection, diagnosis, the intervention plan and learning resources.'],
@@ -951,12 +983,12 @@
           local: ['Local preview', 'The analysis runs in your browser. Open the connected dashboard to run it through n8n.'],
           error: ['Analysis unavailable', 'n8n did not return a valid result. Run the analysis again to retry.'],
         },
-        heading: 'Teacher dashboard', overviewIntro: 'Enter each student’s math scores and days attended. The teacher dashboard helps you spot setbacks, suggests an eight-week support plan, and lets you track progress each week.',
+        heading: 'Teacher dashboard', overviewIntro: 'Choose a student and a subject, or add any subject. Log scores and attendance, run the analysis, and track an eight-week support plan.',
         workflowIntro: 'Select an agent to see its role and findings.',
         followupIntro: 'Review the changes in scores and attendance and see the updated support plan.',
         caseLabel: 'Student case', student: 'Adam Khalil', initials: 'AK', grade: 'Eighth grade',
         risks: { pending: 'Risk assessment pending', high: 'High risk at detection', watch: 'Needs monitoring', low: 'Low risk under detection rules' },
-        detectionResult: (math, attendance, risk) => 'Change in math score: ' + math + ' points. Change in attendance: ' + attendance + ' days. ' + risk + '.',
+        detectionResult: (math, attendance, risk) => 'Change in score: ' + math + ' points. Change in attendance: ' + attendance + ' days. ' + risk + '.',
         fractionClue: (correct, total) => 'The student answered ' + correct + ' of ' + total + ' fraction questions correctly. The result indicates a need for fraction practice.',
         learningAssessment: {
           'no-signal': 'The quiz did not indicate a need for additional fraction practice under the demo rules.',
@@ -969,10 +1001,10 @@
           unknown: 'The case has no transit data.',
           skipped: '',
         },
-        math: 'Math score', attendance: 'Weekly attendance',
+        math: 'Score', attendance: 'Weekly attendance',
         scoreUnit: '/ 100', daysUnit: '/ 5 days', scoreBefore: score => 'Previous score: ' + score,
         daysBefore: days => 'Previous attendance: ' + days + ' of 5 days',
-        trend: 'Math performance', outOf: 'Out of 100', previous: 'Previous score', detected: 'At detection',
+        trend: 'Score trend', outOf: 'Out of 100', previous: 'Previous score', detected: 'At detection',
         latestMeasurement: 'Latest measurement', casePath: 'Case stages', stages: 'Analysis stages',
         run: 'Run agent analysis', running: 'Analyzing…', replay: 'Run analysis again',
         openFollowup: 'Open the 8-week plan', openWorkflow: 'Go to agent workflow',
@@ -985,8 +1017,8 @@
         inProgress: 'The weekly support plan will be available when the analysis finishes.',
         ready: 'The analysis is complete. The eight-week support plan is ready.',
         agents: [
-          ['Detect a decline', 'Compares math scores and attendance across the two weeks and calculates risk using the demo rules.'],
-          ['Diagnose the case', 'Uses the detection result, fraction quiz and transit records to identify what needs follow-up.'],
+          ['Detect a decline', 'Compares scores and attendance across the two weeks and calculates risk using the demo rules.'],
+          ['Diagnose the case', 'Uses the detection result, skill evidence and transit records to identify what needs follow-up.'],
           ['Plan an intervention', 'Schedules support sessions based on the diagnosis.'],
           ['Select resources', 'Suggests practice materials for the support plan.'],
           ['Evaluate the impact', 'Compares weekly measurements with baseline data and updates the support plan.']
@@ -994,15 +1026,15 @@
       },
       uk: {
         about: 'Про проєкт',
-        aboutIntro: 'EduMind AI — навчальний проєкт, який допомагає вчителям вчасно помічати зниження успішності з математики й оцінювати результати підтримки.',
+        aboutIntro: 'EduMind AI — навчальний проєкт, який допомагає вчителям вчасно помічати зниження успішності з будь-якого предмета й оцінювати результати підтримки.',
         aboutUsage: 'Як це допомагає вчителям?',
-        aboutDetails: 'Учителі вносять оцінки з математики й відвідуваність кожного учня. Панель показує зміни та пропонує вправи й заняття на вісім тижнів. Учителі обирають доречні рекомендації та щотижня порівнюють результати.',
+        aboutDetails: 'Кожен учень має один профіль. Оцінки, відвідуваність, спостереження, вправи й щотижневі показники зберігаються окремо для кожного предмета. Доберіть відповідну вправу й порівнюйте результати з початковими протягом восьми тижнів.',
         aboutRepository: 'Код проєкту на GitHub',
         aboutDemo: 'Відкрити панель проєкту',
         aboutTry: 'Спробуйте навчальний приклад',
-        aboutTryText: 'Відкрийте панель і запустіть аналіз для демонстраційного учня. Перегляньте план підтримки, а потім оновіть оцінку й відвідуваність у розділі «Прогрес», щоб порівняти їх із початковими показниками.',
+        aboutTryText: 'Оберіть математику й запустіть аналіз для демонстраційного учня. Перегляньте план підтримки, а потім оновіть оцінку й відвідуваність у розділі «Прогрес», щоб порівняти їх із початковими показниками.',
         aboutTech: 'Технології та налаштування',
-        aboutTechText: 'Панель працює в браузері трьома мовами. Статична версія зберігає записи локально. Налаштуйте облікові дані на сервері Node.js, щоб підключити n8n, Google Sheets та OpenAI.',
+        aboutTechText: 'Ця демонстраційна версія працює в браузері арабською, англійською й українською. Коди учнів, показники з предметів і вправи зберігаються в браузері, де їх внесли.',
         aboutDocs: 'Посібник із налаштування',
         skip: 'Перейти до вмісту', language: 'Мова інтерфейсу', navigation: 'Розділи панелі',
         demo: 'Демонстраційні дані', overview: 'Огляд', workflow: 'Робота агентів', followup: 'Прогрес',
@@ -1018,8 +1050,8 @@
         openProfile: "Відкрити картку учня",
         noSearchResults: "За цим запитом записів немає.",
         guideTitle: "Як працює панель",
-        coverCaptions: ["Перевірка роботи з математики та відвідуваності.", "Спільна робота з учнем над дробами.", "Порівняння результатів учня за тижнями."],
-        coverChapters: [["Вимірювання","Оберіть учня та внесіть оцінки з математики й кількість відвіданих днів. Панель покаже, що змінилося."],["Підтримка","Запустіть аналіз, щоб побачити можливі труднощі й отримати план занять і вправ."],["Прогрес","Щотижня оновлюйте оцінку й відвідуваність. Порівнюйте їх із початковими показниками та визначайте, де потрібна додаткова підтримка."]],
+        coverCaptions: ["Перевірка роботи та відвідуваності.", "Спільне відпрацювання навички з учнем.", "Порівняння результатів учня за тижнями."],
+        coverChapters: [["Вимірювання","Оберіть учня й предмет та внесіть оцінки й кількість відвіданих днів. Панель покаже, що змінилося."],["Підтримка","Запустіть аналіз, щоб побачити можливі труднощі й отримати план занять і вправ."],["Прогрес","Щотижня оновлюйте оцінку й відвідуваність. Порівнюйте їх із початковими показниками та визначайте, де потрібна додаткова підтримка."]],
         workflowMap: 'Переглянути схему n8n',
         hostedMode: ['Режим браузера', 'Правила агентів працюють у браузері. Введені показники зберігаються тут.'],
         loadShared: "Завантажити список із Google Sheets",
@@ -1081,7 +1113,7 @@
         planFocus: {
           fractions: 'Потренуйтеся зводити дроби до спільного знаменника й додавати їх.',
           review: 'Розберіть помилки з останнього тесту й визначте, яка навичка потребує підтримки.',
-          monitor: 'Перевірте оцінку з математики й відвідуваність під час наступного оцінювання.',
+          monitor: 'Перевірте оцінку й відвідуваність під час наступного оцінювання.',
           'word-problems': 'На наступних заняттях зосередьтеся на текстових задачах на додавання дробів.',
           'mixed-review': "Розв’яжіть різні задачі на дроби й попрацюйте над типовими помилками.",
           independent: "Самостійно розв’яжіть кілька задач і поясніть спосіб розв’язання.",
@@ -1106,12 +1138,12 @@
           local: ['Локальний перегляд', 'Аналіз виконується в браузері. Відкрийте підключену панель, щоб запустити його через n8n.'],
           error: ['Аналіз недоступний', 'n8n не повернув дійсного результату. Запустіть аналіз ще раз.'],
         },
-        heading: 'Панель учителя', overviewIntro: 'Внесіть оцінки з математики та кількість відвіданих днів кожного учня. Панель учителя допоможе виявити спад, запропонує план підтримки на вісім тижнів і покаже щотижневий прогрес.',
+        heading: 'Панель учителя', overviewIntro: 'Оберіть учня й предмет або додайте будь-який предмет. Внесіть оцінки й відвідуваність, запустіть аналіз і відстежуйте виконання восьмитижневого плану підтримки.',
         workflowIntro: 'Виберіть агента, щоб переглянути його завдання та висновки.',
         followupIntro: 'Перегляньте зміни в успішності й відвідуваності та оновлений план підтримки.',
         caseLabel: 'Профіль учня', student: 'Адам Халіль', initials: 'АХ', grade: '8-й клас',
         risks: { pending: 'Очікується оцінка ризику', high: 'Високий ризик на момент оцінки', watch: 'Потрібне спостереження', low: 'Низький ризик за правилами оцінювання' },
-        detectionResult: (math, attendance, risk) => 'Зміна оцінки з математики: ' + math + ' (бали). Зміна відвідуваності: ' + attendance + ' (дні). ' + risk + '.',
+        detectionResult: (math, attendance, risk) => 'Зміна оцінки: ' + math + ' (бали). Зміна відвідуваності: ' + attendance + ' (дні). ' + risk + '.',
         fractionClue: (correct, total) => 'Правильно виконано ' + correct + ' із ' + total + ' завдань на дроби. Результат вказує на потребу попрацювати з дробами.',
         learningAssessment: {
           'no-signal': 'За демонстраційними правилами тест не вказав на потребу в додаткових вправах на дроби.',
@@ -1124,10 +1156,10 @@
           unknown: 'У даних учня немає відомостей про транспорт.',
           skipped: '',
         },
-        math: 'Оцінка з математики', attendance: 'Відвідуваність за тиждень',
+        math: 'Оцінка', attendance: 'Відвідуваність за тиждень',
         scoreUnit: 'зі 100', daysUnit: 'з 5 днів', scoreBefore: score => 'Попередня оцінка: ' + score,
         daysBefore: days => 'Раніше: ' + days + ' з 5 днів',
-        trend: 'Успішність із математики', outOf: 'Зі 100 балів', previous: 'Попередня оцінка', detected: 'На момент виявлення',
+        trend: 'Динаміка успішності', outOf: 'Зі 100 балів', previous: 'Попередня оцінка', detected: 'На момент виявлення',
         latestMeasurement: 'Останній показник', casePath: 'Етапи роботи з учнем', stages: 'Етапи аналізу',
         run: 'Запустити аналіз агентів', running: 'Триває аналіз…', replay: 'Запустити аналіз знову',
         openFollowup: 'Відкрити план на 8 тижнів', openWorkflow: 'Перейти до роботи агентів',
@@ -1140,14 +1172,16 @@
         inProgress: 'Щотижневий план підтримки з’явиться після завершення аналізу.',
         ready: 'Аналіз завершено. План підтримки на 8 тижнів готовий.',
         agents: [
-          ['Виявлення спаду', 'Порівнює оцінки з математики й відвідуваність за два тижні та визначає рівень ризику за демонстраційними правилами.'],
-          ['Аналіз причин', 'Використовує оцінку ризику, тест на дроби й записи про транспорт, щоб визначити, що потребує уваги.'],
+          ['Виявлення спаду', 'Порівнює оцінки й відвідуваність за два тижні та визначає рівень ризику за демонстраційними правилами.'],
+          ['Аналіз причин', 'Використовує оцінку ризику, спостереження щодо навичок і записи про транспорт, щоб визначити, що потребує уваги.'],
           ['Планування підтримки', 'Складає розклад занять з урахуванням висновків аналізу.'],
           ['Добір матеріалів', 'Пропонує навчальні матеріали для виконання плану підтримки.'],
           ['Оцінювання результатів', 'Порівнює щотижневі показники з початковими й оновлює план підтримки.']
         ]
       }
     };
+
+    installSubjectCopy(copy);
 
     const demoStudent = {
       code: '',
@@ -1164,16 +1198,28 @@
     const studentPrefix = 'edumind-student:';
     const validStudentCode = /^[A-Z0-9_-]{3,24}$/;
 
+    const demoKey = 'edumind-math-demo';
+    const customSubjects = readCustomSubjects();
+    let subject = 'mathematics';
+    let preferredStudent = '';
+    try {
+      const savedSubject = sessionStorage.getItem('edumind-subject');
+      if (Object.hasOwn(commonSubjects, savedSubject) || customSubjects.some(item => item.id === savedSubject)) subject = savedSubject;
+      preferredStudent = sessionStorage.getItem('edumind-active-student') ?? '';
+    } catch {
+      // The current page works without session storage.
+    }
+
+    function subjectName(id = subject) {
+      return commonSubjects[id]?.[language] ?? customSubjects.find(item => item.id === id)?.name ?? '';
+    }
+
     function getStudents() {
       try {
         return Object.keys(localStorage).filter(key => key.startsWith(studentPrefix)).flatMap(key => {
           try {
-            const record = JSON.parse(localStorage.getItem(key));
-            if (!validStudentCode.test(record.code) || key !== studentPrefix + record.code) return [];
-            const observations = readObservations(record.observations);
-            observations.evidence = readDiagnosisEvidence(record.observations.evidence, observations.current.attendedDays);
-            const checkpoints = readCheckpoints(record, observations.current, readObservations);
-            return [{ code: record.code, observations, checkpoints }];
+            const { code } = JSON.parse(localStorage.getItem(key));
+            return typeof code === 'string' && validStudentCode.test(code) && key === studentPrefix + code ? [{ code }] : [];
           } catch {
             return [];
           }
@@ -1183,28 +1229,57 @@
       }
     }
 
+    function subjectRecord(student) {
+      if (student.source === 'sheets') return subject === 'mathematics' ? student : null;
+      if (!student.code && subject !== 'mathematics') return null;
+      try {
+        const key = student.code ? studentPrefix + student.code : demoKey;
+        const profile = JSON.parse(localStorage.getItem(key));
+        return profile?.subjects?.[subject] ??
+          (subject === 'mathematics' && profile?.observations ? profile : null) ??
+          (!student.code ? demoStudent : null);
+      } catch {
+        return student.code ? null : demoStudent;
+      }
+    }
+
+    function saveSubjectRecord(student, expected, next) {
+      const key = student.code ? studentPrefix + student.code : demoKey;
+      const profile = JSON.parse(localStorage.getItem(key)) ?? { code: student.code };
+      const current = subjectRecord(student);
+      if (JSON.stringify(current) !== JSON.stringify(expected)) return false;
+      localStorage.setItem(key, JSON.stringify({
+        ...profile,
+        subjects: { ...profile.subjects, [subject]: next },
+      }));
+      return true;
+    }
+
+    function subjectCheckpoints(record) {
+      return record ? readCheckpoints(record, record.observations.current, readObservations) : [];
+    }
+
     let roster = getStudents();
     let sharedRoster = [];
     let sharedState = '';
     const selectorValue = student => student.source === 'sheets' ? 'sheet:' + student.code : student.code;
-    let activeStudent = demoStudent;
-    let preferredStudent = '';
-    try {
-      preferredStudent = sessionStorage.getItem('edumind-active-student') ?? '';
-      activeStudent = roster.find(record => record.code === preferredStudent) ?? demoStudent;
-    } catch {
-      // Selection still works for the current page.
-    }
-    let observations = activeStudent.observations;
-
+    let activeStudent = roster.find(record => record.code === preferredStudent) ?? demoStudent;
+    let activeRecord = subjectRecord(activeStudent);
+    let observations = activeRecord?.observations;
+    const usesBrowserAnalysis = () => standalone || subject !== 'mathematics';
     async function requestAnalysis(measurements = []) {
-      if (standalone) {
+      if (usesBrowserAnalysis()) {
         const result = detectRisk(observations);
         const evidence = readDiagnosisEvidence(observations.evidence, observations.current.attendedDays);
+        const academicEvidence = observations.academicEvidence;
         const diagnosis = diagnoseCase(result, evidence);
-        const plan = planIntervention(diagnosis);
-        const { weeks: roadmap, evaluation } = buildRoadmap(plan, observations.current, measurements);
+        if (subject !== 'mathematics' && diagnosis.learning !== 'skipped' && academicEvidence?.skill) {
+          diagnosis.learning = 'subject-skill';
+        }
+        const plan = planIntervention(diagnosis, subject !== 'mathematics');
+        const { weeks: roadmap, evaluation } = buildRoadmap(plan, observations.current, measurements, subject !== 'mathematics');
         const analysis = { ...result, diagnosis, plan, resources: chooseResources(plan), roadmap, support: prioritizeSupport(result, diagnosis) };
+        if (subject !== 'mathematics') analysis.resources = ['subject-exercise'];
         if (evaluation) analysis.evaluation = evaluation;
         return analysis;
       }
@@ -1233,6 +1308,8 @@
     const mobileNav = $('#mobile-nav');
     const menuToggle = $('#menu-toggle');
     const languagePicker = $('#language');
+    const subjectPicker = $('#subject-picker');
+    const subjectDialog = $('#subject-dialog');
     const studentPicker = $('#student-picker');
     const studentForm = $('#student-form');
     const sharedButton = $('#load-shared');
@@ -1292,7 +1369,8 @@
     let evaluation = null;
     let evaluationFailed = false;
     let evaluationFailure = 'evaluationError';
-    let checkpoints = [...activeStudent.checkpoints];
+    let checkpoints = subjectCheckpoints(activeRecord);
+    let editingBaseline = false;
     let formFailure = '';
     let rosterView = 'gallery';
     let currentChapter = 0;
@@ -1325,7 +1403,7 @@
     }
 
     function renderDirectory(t) {
-      const students = [demoStudent, ...roster, ...sharedRoster];
+      const students = [...(subject === 'mathematics' ? [demoStudent] : []), ...roster, ...sharedRoster];
       const query = rosterSearch.value.trim().toLocaleLowerCase(language);
       const entries = students.filter(student =>
         (student.code || t.sampleStudent).toLocaleLowerCase(language).includes(query));
@@ -1348,8 +1426,9 @@
         code.textContent = student.code || t.sampleStudent;
         name.append(avatar, code);
         const progress = document.createElement('small');
-        progress.textContent = (student.source === 'sheets' ? 'Google Sheets · ' : '') +
-          t.roadmapProgress(student.checkpoints.length + 1);
+        const record = subjectRecord(student);
+        progress.textContent = !record ? t.emptySubject : (student.source === 'sheets' ? 'Google Sheets · ' : '') +
+          t.roadmapProgress(subjectCheckpoints(record).length + 1);
         button.append(name, progress);
         item.append(button);
         return item;
@@ -1364,16 +1443,18 @@
 
     function renderProfile(t) {
       if (!profileStudent) return;
-      const measurement = profileStudent.checkpoints.at(-1) ?? profileStudent.observations.current;
+      const record = subjectRecord(profileStudent);
+      const weeks = subjectCheckpoints(record);
+      const measurement = weeks.at(-1) ?? record?.observations.current;
       $('#profile-title').textContent = profileStudent.code || t.sampleStudent;
-      $('#profile-progress').textContent = t.roadmapProgress(profileStudent.checkpoints.length + 1);
-      $('#profile-score').textContent = measurement.mathScore + ' ' + t.scoreUnit;
-      $('#profile-days').textContent = measurement.attendedDays + ' ' + t.daysUnit;
+      $('#profile-progress').textContent = subjectName() + ' · ' + (record ? t.roadmapProgress(weeks.length + 1) : t.emptySubject);
+      $('#profile-score').textContent = measurement ? measurement.mathScore + ' ' + t.scoreUnit : '—';
+      $('#profile-days').textContent = measurement ? measurement.attendedDays + ' ' + t.daysUnit : '—';
       $('#open-profile').disabled = running || evaluating;
     }
 
     function loadSampleWeek() {
-      const sample = activeStudent.code ? null : sampleWeeks[checkpoints.length];
+      const sample = activeStudent.code || subject !== 'mathematics' ? null : sampleWeeks[checkpoints.length];
       scoreInput.value = sample?.[0] ?? '';
       attendanceInput.value = sample?.[1] ?? '';
     }
@@ -1388,7 +1469,25 @@
       studentPicker.replaceChildren(...choices);
       studentPicker.value = selectorValue(activeStudent);
       studentPicker.disabled = busy;
-      $('#student-switch').hidden = screen === 'students';
+      choices[0].textContent = subject === 'mathematics' ? t.sampleStudent : t.chooseStudent;
+      const subjectOptions = [
+        ...Object.keys(commonSubjects).map(id => new Option(subjectName(id), id)),
+        ...customSubjects.map(({ id, name }) => new Option(name, id)),
+      ];
+      if (subjectOptions.length !== subjectPicker.options.length ||
+          subjectOptions.some((option, index) => option.value !== subjectPicker.options[index].value ||
+            option.text !== subjectPicker.options[index].text)) subjectPicker.replaceChildren(...subjectOptions);
+      subjectPicker.value = subject;
+      subjectPicker.disabled = $('#add-subject').disabled = busy;
+      $('#student-switch').hidden = screen === 'about';
+      $('#load-shared').hidden = standalone || subject !== 'mathematics';
+      $('#new-student-heading').textContent = t[editingBaseline ? 'enterBaseline' : 'addStudent'];
+      $('#save-student').textContent = t[editingBaseline ? 'saveBaseline' : 'saveStudent'];
+      $('#entry-subject').textContent = subjectName() + (editingBaseline ? ' · ' + activeStudent.code : '');
+      $('#entry-code-label').hidden = editingBaseline;
+      $('#new-code').required = !editingBaseline;
+      all('.quiz-field').forEach(field => { field.hidden = subject !== 'mathematics'; });
+      all('.academic-field').forEach(field => { field.hidden = subject === 'mathematics'; });
       $('#save-student').disabled = busy;
       sharedButton.disabled = busy || sharedState === 'sharedLoading';
       const status = $('#shared-status');
@@ -1400,9 +1499,11 @@
       renderProfile(t);
       const source = activeStudent.source === 'sheets' ? 'Google Sheets' : t.manualCase;
       $('#case-source').textContent = activeStudent.code ? source : t.demo;
+      if (!activeStudent.code && subject !== 'mathematics') $('#case-source').textContent = t.hostedMode[0];
       $('#student').textContent = activeStudent.code || t.student;
       $('#student-initials').textContent = activeStudent.code.slice(0, 2) || t.initials;
       $('#student-description').textContent = activeStudent.code ? source : t.grade;
+      $('#trend').textContent = t.trend + ' · ' + subjectName();
       $('#checkpoint-source').textContent = activeStudent.code ? t.manualCheckpoint : t.sampleCheckpoint;
     }
 
@@ -1456,14 +1557,14 @@
       main.dataset.screen = screen;
       $('#current-menu-label').textContent = t[screen];
       if (screen === 'overview') renderCover(t);
-      const mode = standalone ? 'local' : detection ? 'verified' : detectionFailed ? 'error' : running ? 'running' : 'ready';
-      const [connectionLabel, connectionNote] = hosted ? t.hostedMode : t.connection[mode];
+      const mode = usesBrowserAnalysis() ? 'local' : detection ? 'verified' : detectionFailed ? 'error' : running ? 'running' : 'ready';
+      const [connectionLabel, connectionNote] = hosted || subject !== 'mathematics' ? t.hostedMode : t.connection[mode];
       const signed = new Intl.NumberFormat(language, { signDisplay: 'exceptZero' });
       const connection = $('#connection');
       connection.dataset.mode = mode;
       if (connection.textContent !== connectionLabel) connection.textContent = connectionLabel;
       $('#connection-note').textContent = connectionNote;
-      $('#integration').hidden = screen === 'followup' || screen === 'students';
+      $('#integration').hidden = !observations || screen === 'followup' || screen === 'students';
       $('#live-link').hidden = !standalone || hosted;
       renderStudents(t);
       $('#priority-support').hidden = screen === 'students' || !detection?.support?.length;
@@ -1484,12 +1585,14 @@
           t.risks[detection.risk],
         );
         const { learning, transport } = detection.diagnosis;
-        const quiz = observations.evidence.fractionQuiz;
+        const quiz = observations.evidence?.fractionQuiz;
         const learningText = learning === 'fractions' && quiz ? t.fractionClue(quiz.correct, quiz.total) : t.learningAssessment[learning];
-        summaries[1] = [learningText, t.transportAssessment[transport]].filter(Boolean).join(' ');
+        const academicText = subject === 'mathematics' || learning === 'skipped' ? learningText
+          : observations.academicEvidence?.skill ? t.skill + ' · ' + observations.academicEvidence.skill : t.noAcademicEvidence;
+        summaries[1] = [academicText, t.transportAssessment[transport]].filter(Boolean).join(' ');
         const { focus, sessions, minutes } = detection.plan;
         summaries[2] = [sessions ? t.planSession(sessions, minutes) : '', t.planFocus[focus]].filter(Boolean).join(' ');
-        summaries[3] = t.resourcesText[focus];
+        summaries[3] = subject === 'mathematics' ? t.resourcesText[focus] : (observations.academicEvidence?.exercise || t.exerciseDefault);
       }
       $('#summary-detection-title').textContent = t.agents[0][0];
       $('#summary-detection').textContent = detectionFailed ? t.detectionError : summaries[0];
@@ -1505,7 +1608,7 @@
       $('#follow-caption').textContent = evaluation ? t.weekLabel(lastWeek) : t.latestMeasurement;
       if (evaluation) {
         summaries[4] = t.evaluationResult(evaluation.mathScore, evaluation.attendedDays) + ' ' + t.planFocus[evaluation.focus];
-        $('#evaluation-source').textContent = t.connection[standalone ? 'local' : 'verified'][0];
+        $('#evaluation-source').textContent = t.connection[usesBrowserAnalysis() ? 'local' : 'verified'][0];
         $('#comparison').textContent = t.weekReport(lastWeek);
         $('#math-comparison').textContent = observations.current.mathScore + ' → ' + evaluation.mathScore;
         $('#attendance-comparison').textContent = observations.current.attendedDays + ' → ' + evaluation.attendedDays;
@@ -1519,7 +1622,13 @@
       document.title = 'EduMind AI · ' + screenTitle;
       heading.textContent = screenTitle;
       $('#introduction').textContent = t[screen + 'Intro'];
-      screens.forEach(panel => { panel.hidden = panel.id !== 'screen-' + screen; });
+      const needsBaseline = !observations && screen !== 'students' && screen !== 'about';
+      $('#empty-subject').hidden = !needsBaseline;
+      $('#empty-subject-note').textContent = activeStudent.code ? subjectName() + ' · ' + activeStudent.code : t.chooseOrAddStudent;
+      const entryLink = $('#enter-baseline');
+      entryLink.href = activeStudent.code ? '#students/baseline' : '#students/new';
+      entryLink.textContent = activeStudent.code ? t.enterBaseline : t.addStudent;
+      screens.forEach(panel => { panel.hidden = needsBaseline || panel.id !== 'screen-' + screen; });
       navigation.forEach(link => {
         if (link.dataset.route === screen) link.setAttribute('aria-current', 'page');
         else link.removeAttribute('aria-current');
@@ -1536,10 +1645,10 @@
       $('#progress').textContent = $('#overviewProgress').textContent = t.progress(total, icons.length);
       riskBadge.dataset.level = detection?.risk ?? 'pending';
       riskBadge.textContent = t.risks[riskBadge.dataset.level];
-      $('#score').textContent = evaluation?.mathScore ?? observations.current.mathScore;
-      $('#days').textContent = evaluation?.attendedDays ?? observations.current.attendedDays;
-      $('#scoreChange').textContent = evaluation ? t.sinceDetection + ' ' + signed.format(evaluation.mathChange) : t.scoreBefore(observations.previous.mathScore);
-      $('#daysChange').textContent = evaluation ? t.sinceDetection + ' ' + signed.format(evaluation.attendanceChange) : t.daysBefore(observations.previous.attendedDays);
+      $('#score').textContent = evaluation?.mathScore ?? observations?.current.mathScore ?? '—';
+      $('#days').textContent = evaluation?.attendedDays ?? observations?.current.attendedDays ?? '—';
+      $('#scoreChange').textContent = evaluation ? t.sinceDetection + ' ' + signed.format(evaluation.mathChange) : observations ? t.scoreBefore(observations.previous.mathScore) : '';
+      $('#daysChange').textContent = evaluation ? t.sinceDetection + ' ' + signed.format(evaluation.attendanceChange) : observations ? t.daysBefore(observations.previous.attendedDays) : '';
       $('#report').hidden = $('#followBar').hidden = !evaluation;
       $('.bar-pending').hidden = Boolean(evaluation);
       checkpointForm.hidden = !ready || allMeasured;
@@ -1556,8 +1665,8 @@
       chartPoints.forEach((point, index) => {
         point.setAttribute('aria-pressed', String(index === selectedPoint));
       });
-      const previousScore = observations.previous.mathScore;
-      const baselineScore = observations.current.mathScore;
+      const previousScore = observations?.previous.mathScore ?? 0;
+      const baselineScore = observations?.current.mathScore ?? 0;
       const previousBar = $('#previous-bar');
       const baselineBar = $('#baseline-bar');
       previousBar.textContent = previousScore;
@@ -1604,6 +1713,8 @@
         : ai?.status === 'not-configured' ? t.aiNotConfigured : ai?.status === 'unavailable' ? t.aiUnavailable : '';
       const resources = activeAgent === 3 && state === 'done' ? detection.resources : [];
       $('#agent-resources').hidden = resources.length === 0;
+      $('#exercise-guidance').textContent = observations?.academicEvidence?.exercise || t.exerciseDefault;
+      $('#exercise-form').hidden = !activeStudent.code || running || evaluating;
       resourceItems.forEach(item => { item.hidden = !resources.includes(item.dataset.resource); });
 
       const message = detectionFailed ? t.detectionError : evaluationFailed ? t[evaluationFailure] : evaluating ? t.evaluating
@@ -1621,7 +1732,7 @@
       render();
     }
 
-    function readRoute(moveFocus) {
+    function readRoute(moveFocus, animate = true) {
       const hash = location.hash || '#overview';
       if (renderedRoute && renderedRoute !== hash) readingPositions.set(renderedRoute, window.scrollY);
       const version = ++navigationVersion;
@@ -1630,9 +1741,14 @@
         const agentRoute = /^#workflow\/([1-5])$/.exec(hash);
         const studentRoute = /^#students\/([^/]+)$/.exec(hash);
         const route = hash.slice(1);
-        const addStudent = studentRoute?.[1] === 'new';
+        editingBaseline = studentRoute?.[1] === 'baseline' && Boolean(activeStudent.code) && !activeRecord;
+        const addStudent = studentRoute?.[1] === 'new' || editingBaseline;
+        if (addStudent && !entryDialog.open) {
+          studentForm.reset();
+          formFailure = '';
+        }
         profileStudent = null;
-        if (studentRoute && !addStudent) {
+        if (studentRoute && !addStudent && studentRoute[1] !== 'baseline') {
           try {
             const code = decodeURIComponent(studentRoute[1]);
             const record = findStudent(code === 'demo' ? '' : code);
@@ -1651,7 +1767,7 @@
         render();
         if (addStudent && !entryDialog.open) {
           entryDialog.showModal();
-          $('#new-code').focus();
+          $(editingBaseline ? '#new-previous-score' : '#new-code').focus();
         } else if (profileStudent && !profileDialog.open) {
           profileDialog.showModal();
           $('#profile-title').focus();
@@ -1671,7 +1787,7 @@
         paintCover();
       };
       currentTransition?.skipTransition();
-      if (moveFocus && !reducedMotion.matches && document.startViewTransition) {
+      if (moveFocus && animate && !reducedMotion.matches && document.startViewTransition) {
         currentTransition = document.startViewTransition(update);
       } else {
         update();
@@ -1760,8 +1876,11 @@
     function activateStudent(student, openOverview = true) {
       if (!student || running || evaluating) return;
       activeStudent = student;
-      observations = student.observations;
-      checkpoints = [...student.checkpoints];
+      activeRecord = subjectRecord(student);
+      observations = activeRecord?.observations;
+      checkpoints = subjectCheckpoints(activeRecord);
+      $('#edit-exercise').value = observations?.academicEvidence?.exercise ?? '';
+      $('#exercise-status').textContent = '';
       completed = 0;
       detection = evaluation = null;
       detectionFailed = evaluationFailed = false;
@@ -1774,9 +1893,13 @@
       } catch {
         // Selection can still be used while this page is open.
       }
-      if (openOverview && location.hash !== '#overview') location.hash = 'overview';
-      render();
-      if (checkpoints.length) void runAnalysis(true);
+      if (openOverview && location.hash !== '#overview') {
+        history.pushState(null, '', '#overview');
+        readRoute(true, false);
+      } else {
+        render();
+      }
+      if (activeRecord?.analyzed || checkpoints.length) void runAnalysis(true);
     }
 
     function findStudent(value) {
@@ -1804,6 +1927,69 @@
     }
 
     sharedButton.addEventListener('click', () => { void loadSharedRoster(); });
+    function selectSubject(id) {
+      subject = id;
+      try {
+        sessionStorage.setItem('edumind-subject', id);
+      } catch {
+        // The selection still works in this tab.
+      }
+      activateStudent(activeStudent, false);
+      if (profileStudent) renderProfile(copy[language]);
+    }
+
+    subjectPicker.addEventListener('change', () => selectSubject(subjectPicker.value));
+    $('#add-subject').addEventListener('click', () => {
+      $('#subject-form').reset();
+      $('#subject-error').textContent = '';
+      subjectDialog.showModal();
+      $('#subject-name').focus();
+    });
+    $('#close-subject').addEventListener('click', () => subjectDialog.close());
+    $('#subject-form').addEventListener('submit', event => {
+      event.preventDefault();
+      const name = $('#subject-name').value.trim();
+      if (!name) return;
+      const t = copy[language];
+      try {
+        const latest = readCustomSubjects();
+        const equivalent = value => value.normalize('NFKC').toLowerCase() === name.normalize('NFKC').toLowerCase();
+        const common = Object.entries(commonSubjects).find(([, names]) => Object.values(names).some(equivalent));
+        const existing = latest.find(item => equivalent(item.name));
+        const id = common?.[0] ?? existing?.id ?? 'custom-' + encodeURIComponent(name.normalize('NFKC').toLowerCase());
+        if (!common && !existing) {
+          latest.push({ id, name });
+          localStorage.setItem(customSubjectKey, JSON.stringify(latest));
+        }
+        customSubjects.splice(0, customSubjects.length, ...latest);
+        subjectDialog.close();
+        selectSubject(id);
+      } catch {
+        $('#subject-error').textContent = t.storageError;
+      }
+    });
+    $('#exercise-form').addEventListener('submit', event => {
+      event.preventDefault();
+      if (!activeRecord || subject === 'mathematics' || !activeStudent.code || running || evaluating) return;
+      const t = copy[language];
+      const exercise = $('#edit-exercise').value.trim();
+      const next = { ...activeRecord, observations: {
+        ...observations, academicEvidence: { ...observations.academicEvidence, exercise },
+      } };
+      try {
+        if (!saveSubjectRecord(activeStudent, activeRecord, next)) {
+          $('#exercise-status').textContent = t.storageConflict;
+          return;
+        }
+        activeRecord = next;
+        observations = next.observations;
+        $('#edit-exercise').value = exercise;
+        render();
+        $('#exercise-status').textContent = t.exerciseSaved;
+      } catch {
+        $('#exercise-status').textContent = t.storageError;
+      }
+    });
     studentPicker.addEventListener('change', () => activateStudent(findStudent(studentPicker.value)));
     $('#student-list').addEventListener('click', event => {
       const row = event.target.closest('button[data-student-code]');
@@ -1820,7 +2006,7 @@
     studentForm.addEventListener('submit', event => {
       event.preventDefault();
       if (running || evaluating) return;
-      const code = $('#new-code').value.trim().toUpperCase();
+      const code = editingBaseline ? activeStudent.code : $('#new-code').value.trim().toUpperCase();
       if (!validStudentCode.test(code)) return;
       const input = readObservations({
         previous: { mathScore: $('#new-previous-score').valueAsNumber, attendedDays: $('#new-previous-days').valueAsNumber },
@@ -1831,7 +2017,7 @@
       const bus = $('#new-bus');
       try {
         input.evidence = readDiagnosisEvidence({
-          fractionQuiz: correct.value !== '' || total.value !== '' ? { correct: correct.valueAsNumber, total: total.valueAsNumber } : null,
+          fractionQuiz: subject === 'mathematics' && (correct.value !== '' || total.value !== '') ? { correct: correct.valueAsNumber, total: total.valueAsNumber } : null,
           lateBusOnAbsenceDays: bus.value === '' ? null : bus.valueAsNumber,
         }, input.current.attendedDays);
       } catch {
@@ -1839,15 +2025,23 @@
         renderStudents(copy[language]);
         return;
       }
-      const student = { code, observations: input, checkpoints: [] };
+      if (subject !== 'mathematics') input.academicEvidence = {
+        skill: $('#new-skill').value.trim(), exercise: $('#new-exercise').value.trim(),
+      };
+      const student = { code };
+      const record = { observations: input, checkpoints: [] };
       try {
         const key = studentPrefix + code;
-        if (localStorage.getItem(key) !== null) {
+        if (!editingBaseline && localStorage.getItem(key) !== null) {
           formFailure = 'duplicateStudent';
           renderStudents(copy[language]);
           return;
         }
-        localStorage.setItem(key, JSON.stringify(student));
+        if (!saveSubjectRecord(student, null, record)) {
+          formFailure = 'storageConflict';
+          renderStudents(copy[language]);
+          return;
+        }
       } catch {
         formFailure = 'storageError';
         renderStudents(copy[language]);
@@ -1859,13 +2053,13 @@
     });
 
     async function runAnalysis(restore = false) {
-      if (running || evaluating) return;
+      if (!activeRecord || running || evaluating) return;
       completed = 0;
       detection = null;
       detectionFailed = false;
       evaluation = null;
       evaluationFailed = false;
-      checkpoints = [...activeStudent.checkpoints];
+      checkpoints = subjectCheckpoints(activeRecord);
       loadSampleWeek();
       running = true;
       selectedAgent = null;
@@ -1892,6 +2086,14 @@
         completed += 1;
         if (completed === lastAgent) running = false;
         render();
+      }
+      if (!restore && activeStudent.source !== 'sheets' && !activeRecord.analyzed) {
+        const next = { ...activeRecord, analyzed: true };
+        try {
+          if (saveSubjectRecord(activeStudent, activeRecord, next)) activeRecord = next;
+        } catch {
+          // Analysis remains available for the current session.
+        }
       }
     }
 
@@ -1923,17 +2125,14 @@
         } else {
           result = await requestAnalysis(next);
         }
-        if (activeStudent.code && activeStudent.source !== 'sheets') {
-          const key = studentPrefix + activeStudent.code;
+        if (activeStudent.source !== 'sheets') {
           try {
-            if (localStorage.getItem(key) !== JSON.stringify(activeStudent)) {
+            const updated = { ...activeRecord, checkpoints: next, analyzed: true };
+            if (!saveSubjectRecord(activeStudent, activeRecord, updated)) {
               evaluationFailure = 'storageConflict';
               throw new Error('Record changed');
             }
-            const updated = { ...activeStudent, checkpoints: next };
-            localStorage.setItem(key, JSON.stringify(updated));
-            activeStudent = updated;
-            roster = getStudents();
+            activeRecord = updated;
           } catch (error) {
             if (evaluationFailure !== 'storageConflict') evaluationFailure = 'storageError';
             throw error;
@@ -1957,10 +2156,11 @@
     runButtons.forEach(button => button.addEventListener('click', () => runAnalysis()));
     followButtons.forEach(button => button.addEventListener('click', () => { location.hash = 'followup'; }));
     checkpointForm.addEventListener('submit', recordCheckpoint);
+    $('#edit-exercise').value = observations?.academicEvidence?.exercise ?? '';
     readRoute(false);
     applyLanguage();
-    if (checkpoints.length) void runAnalysis(true);
-    if (preferredStudent.startsWith('sheet:')) void loadSharedRoster(preferredStudent);
+    if (activeRecord?.analyzed || checkpoints.length) void runAnalysis(true);
+    if (subject === 'mathematics' && preferredStudent.startsWith('sheet:')) void loadSharedRoster(preferredStudent);
     else if (/^#students\/sheet(?:%3A|:)/i.test(location.hash)) void loadSharedRoster();
   </script>
 </body>

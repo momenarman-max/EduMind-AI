@@ -1,5 +1,6 @@
-function planIntervention(diagnosis) {
+function planIntervention(diagnosis, generalSubject = false) {
   if (diagnosis.learning === 'skipped') return { focus: 'monitor', sessions: 0, minutes: 0 };
+  if (generalSubject) return { focus: 'guided', sessions: 2, minutes: 15 };
   if (diagnosis.learning === 'fractions') return { focus: 'fractions', sessions: 3, minutes: 20 };
   return { focus: 'review', sessions: 1, minutes: 15 };
 }
@@ -50,9 +51,10 @@ function evaluateFollowup(focus, baseline, previous, measurement) {
   };
 }
 
-function buildRoadmap(plan, baseline, checkpoints) {
+function buildRoadmap(plan, baseline, checkpoints, generalSubject = false) {
   const projected = ['fractions', 'fractions', 'word-problems', 'word-problems', 'word-problems',
     'mixed-review', 'mixed-review', 'independent'];
+  const generalFocus = ['guided', 'guided', 'guided', 'apply', 'apply', 'apply', 'consolidate', 'consolidate'];
   const mathTargets = [60, 68, 72, 74, 76, 78, 82, 85];
   const weeks = [];
   let focus = plan.focus;
@@ -60,7 +62,9 @@ function buildRoadmap(plan, baseline, checkpoints) {
   let evaluation = null;
   for (let index = 0; index < 8; index++) {
     const measurement = index === 0 ? baseline : checkpoints[index - 1] ?? null;
-    const scheduledFocus = index > checkpoints.length + 1 && plan.focus === 'fractions' ? projected[index] : focus;
+    let scheduledFocus = focus;
+    if (generalSubject && plan.focus === 'guided') scheduledFocus = generalFocus[index];
+    else if (index > checkpoints.length + 1 && plan.focus === 'fractions') scheduledFocus = projected[index];
     const shorter = scheduledFocus === 'mixed-review' || scheduledFocus === 'independent';
     const sessions = shorter ? (scheduledFocus === 'mixed-review' ? 2 : 1) : plan.sessions;
     const minutes = scheduledFocus === 'independent' ? 15 : plan.minutes;
@@ -69,12 +73,14 @@ function buildRoadmap(plan, baseline, checkpoints) {
       focus: scheduledFocus,
       sessions,
       minutes,
-      mathTarget: Math.max(baseline.mathScore, mathTargets[index]),
+      mathTarget: generalSubject ? Math.min(100, baseline.mathScore + (plan.sessions ? 2 * index : 0))
+        : Math.max(baseline.mathScore, mathTargets[index]),
       attendanceTarget: index < 4 ? 4 : 5,
       measurement,
     });
     if (index > 0 && measurement) {
       evaluation = evaluateFollowup(focus, baseline, previous, measurement);
+      if (generalSubject && plan.focus === 'guided') evaluation.focus = generalFocus[Math.min(index + 1, 7)];
       focus = evaluation.focus;
       previous = measurement;
     }

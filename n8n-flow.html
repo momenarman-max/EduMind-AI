@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>EduMind AI · مخطط n8n</title>
+  <style>
+    :root { color: #172c25; background: #f5f5ee; font: 16px/1.65 Tahoma, sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    .shell { width: min(900px, calc(100% - 36px)); margin-inline: auto; }
+    header { background: #15392d; color: white; }
+    header .shell { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 68px; padding-block: 10px; }
+    a { color: inherit; text-underline-offset: 4px; }
+    a:focus-visible, summary:focus-visible { outline: 3px solid #8a5712; outline-offset: 4px; }
+    main { padding-block: clamp(24px, 6vw, 52px); }
+    h1 { margin: 0; font-size: clamp(30px, 5vw, 49px); line-height: 1.2; }
+    main > p { color: #4c6257; margin: 12px 0 22px; }
+    .download { display: inline-flex; align-items: center; min-height: 44px; padding: 7px 14px; background: #245941; color: #fff; border-radius: 8px; }
+    ol { list-style: none; margin: 26px 0 0; padding: 0; }
+    li { position: relative; padding-block-end: 18px; }
+    li:not(:last-child)::after { content: ''; position: absolute; inset-block-end: 0; inset-inline-start: 27px; height: 18px; border-inline-start: 2px solid #86aa8b; }
+    details { background: #fffef9; border: 1px solid #cddcca; border-radius: 12px; }
+    details[open] { border-color: #86aa8b; }
+    summary { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; cursor: pointer; min-height: 55px; padding: 10px 15px; }
+    summary::-webkit-details-marker { display: none; }
+    summary::before { content: '+'; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: #edf4e9; color: #245941; font-weight: bold; }
+    details[open] summary::before { content: '−'; }
+    .node-name { color: #4c6257; font-size: 14px; }
+    details p { margin: 0 0 14px; padding-inline: 15px 20px; }
+    code { direction: ltr; unicode-bidi: isolate; color: #245941; }
+  </style>
+</head>
+<body>
+  <header><div class="shell"><bdi>EduMind AI</bdi><a href="index.html">العودة إلى اللوحة</a></div></header>
+  <main class="shell">
+    <h1>مخطط الوكلاء في <bdi>n8n</bdi></h1>
+    <p>هذا المخطط يعرض عقد المسار القابل للاستيراد. اضغط على أي عقدة لتعرف شو تستقبل وشو بتمرّر للخطوة التالية.</p>
+    <a class="download" href="n8n/detection.workflow.json" download>نزّل ملف المسار للاستيراد</a>
+    <ol>
+      <li><details open data-node="Receive observations"><summary><strong>استقبال القياسات</strong><bdi class="node-name">Receive observations · Webhook</bdi></summary><p>ترسل اللوحة قياسات الرياضيات والحضور عبر الخادم إلى <code>POST /webhook/edumind/detection</code>. يبقى مفتاح المصادقة في الخادم.</p></details></li>
+      <li><details data-node="Detect risk"><summary><strong>رصد التغيّر</strong><bdi class="node-name">Detect risk</bdi></summary><p>يتحقق من نطاق القياسات ويحسب تغيّر العلامة والحضور. يمرّر مستوى الخطر الأكاديمي والأدلة المتوفرة.</p></details></li>
+      <li><details data-node="Diagnose case"><summary><strong>تشخيص الحالة</strong><bdi class="node-name">Diagnose case</bdi></summary><p>يقرأ مستوى الخطر ويبحث عن إشارة تحتاج متابعة في اختبار الكسور أو سجلّ النقل. التزامن مع تأخّر الحافلة عامل يستحق التحقق.</p></details></li>
+      <li><details data-node="Plan intervention"><summary><strong>خطة التدخّل والأولويات</strong><bdi class="node-name">Plan intervention</bdi></summary><p>يختار هدف جلسات الدعم وعددها ومدّتها. يضيف خطوات دعم عاجلة إذا كان الخطر مرتفعًا.</p></details></li>
+      <li><details data-node="Choose resources"><summary><strong>اختيار الموارد</strong><bdi class="node-name">Choose resources</bdi></summary><p>يختار الموارد المناسبة لهدف الخطة، مثل فيديو وتمرين في جمع الكسور.</p></details></li>
+      <li><details data-node="Evaluate follow-up"><summary><strong>متابعة ثمانية أسابيع</strong><bdi class="node-name">Evaluate follow-up</bdi></summary><p>يبني الخطة الأسبوعية ويقارن أحدث قياس بخط الأساس. إذا وصل قياس جديد، يحدّث تركيز الأسبوع التالي حسب النتيجة.</p></details></li>
+      <li><details data-node="Return detection"><summary><strong>إرجاع النتيجة للوحة</strong><bdi class="node-name">Return detection · Respond to Webhook</bdi></summary><p>يرجع الرصد والتشخيص والخطة والموارد ونتائج المتابعة بصيغة JSON.</p></details></li>
+    </ol>
+  </main>
+</body>
+</html>

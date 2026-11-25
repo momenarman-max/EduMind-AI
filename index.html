@@ -1,0 +1,1623 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>EduMind AI · لوحة المعلّم</title>
+  <style>
+    :root {
+      --paper: #f5f5ee;
+      --card: #fffef9;
+      --ink: #172c25;
+      --muted: #4c6257;
+      --line: #d8dfd3;
+      --green: #245941;
+      --dark: #15392d;
+      --lime: #dcf69d;
+      --radius: 19px;
+      --display: Georgia, Cambria, serif;
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    :root[lang="ar"] {
+      font-family: Tahoma, "Segoe UI", sans-serif;
+      --display: "Arabic Typesetting", Tahoma, serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body, h1, h2, h3, p { margin: 0; }
+    body { min-width: 0; }
+    button, select { font: inherit; }
+    button, select { cursor: pointer; }
+    a { color: inherit; }
+    :focus-visible { outline: 3px solid #8a5712; outline-offset: 3px; }
+    h1, h2, h3 { text-wrap: balance; }
+    .shell { width: min(1184px, calc(100% - 64px)); margin-inline: auto; }
+    .skip {
+      position: fixed; inset-block-start: 12px; inset-inline-start: 15px; z-index: 3;
+      padding: 12px 16px; background: var(--lime); color: var(--ink); transform: translateY(-160%);
+    }
+    .skip:focus { transform: none; }
+    .masthead { background: var(--dark); color: #fff; }
+    .masthead :focus-visible, .hero :focus-visible { outline-color: var(--lime); }
+    .top {
+      min-height: 76px; display: flex; align-items: center; justify-content: space-between;
+      gap: 18px; padding-block: 13px;
+    }
+    .brand, .header-controls, .identity, .actions {
+      display: flex; align-items: center; gap: 12px; min-width: 0;
+    }
+    .brand {
+      color: #fff; font-size: 21px; font-weight: 800; letter-spacing: -.045em;
+      text-decoration: none; gap: 10px; white-space: nowrap;
+    }
+    .brand-mark {
+      width: 34px; height: 34px; display: grid; flex: none; place-items: center;
+      background: var(--lime); color: var(--dark); border-radius: 9px 9px 9px 2px; font-size: 25px;
+    }
+    .demo { color: #e2efe4; font-size: 13px; }
+    .demo::before, .risk::before {
+      content: ""; display: inline-block; vertical-align: middle; width: 7px; height: 7px;
+      border-radius: 50%; margin-inline-end: 7px; background: var(--lime);
+    }
+    .language {
+      min-height: 44px; padding: 7px 10px; border: 1px solid #739181;
+      border-radius: 9px; color: #fff; background: #214a3a; color-scheme: dark;
+    }
+    .language option { background: #214a3a; color: #fff; }
+    .nav-band { background: var(--card); border-bottom: 1px solid var(--line); }
+    .site-nav { display: flex; align-items: stretch; gap: clamp(10px, 3vw, 35px); }
+    .site-nav a {
+      position: relative; display: flex; align-items: center; justify-content: center; gap: 8px;
+      min-height: 55px; padding: 8px 4px; color: var(--muted); text-align: center;
+      font-size: 14px; font-weight: 700; line-height: 1.35; text-decoration: none;
+    }
+    .site-nav a:hover, .site-nav a[aria-current="page"] { color: var(--green); }
+    .site-nav a::after {
+      content: ""; position: absolute; inset-inline: 0; inset-block-end: 0; height: 3px;
+      background: var(--green); transform: scaleX(0); transition: transform .2s ease;
+    }
+    .site-nav a[aria-current="page"]::after { transform: scaleX(1); }
+    .nav-mark { font-size: 17px; line-height: 1; }
+    main { padding-block: clamp(24px, 4.5vw, 52px) 52px; }
+    .intro { margin-block-end: clamp(22px, 3vw, 32px); }
+    .intro p { color: var(--muted); margin-block-start: 8px; line-height: 1.6; }
+    h1 {
+      font: 700 clamp(44px, 6vw, 72px)/.99 var(--display);
+      width: fit-content; max-width: 100%; letter-spacing: -.065em; overflow-wrap: anywhere;
+    }
+    :lang(ar) h1 { font-size: clamp(47px, 7vw, 83px); line-height: .98; letter-spacing: normal; }
+    h2 { font-size: clamp(20px, 2.3vw, 25px); line-height: 1.2; }
+    .screen { animation: arrive .3s ease-out both; }
+    @keyframes arrive { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+    .dashboard { display: grid; grid-template-columns: minmax(0, 1.22fr) minmax(0, 1fr); gap: 18px; }
+    .card {
+      padding: clamp(18px, 3vw, 28px); background: var(--card); border: 1px solid var(--line);
+      border-radius: var(--radius); min-width: 0;
+    }
+    .hero {
+      position: relative; isolation: isolate; display: flex; flex-direction: column;
+      overflow: hidden; background: var(--dark); border-color: var(--dark); color: #fff;
+    }
+    .hero::before {
+      content: ""; position: absolute; z-index: -1; width: 365px; height: 365px;
+      inset-inline-end: -185px; inset-block-start: -180px; border-radius: 50%;
+      background: repeating-radial-gradient(circle, #ffffff14 0 1px, transparent 1px 17px);
+      pointer-events: none;
+    }
+    .hero .section-head { flex-wrap: wrap; align-items: center; }
+    .case-label, .identity p { color: #dce8dd; font-size: 13px; line-height: 1.55; }
+    .identity { margin-block-start: 23px; }
+    .identity h2 {
+      font: 700 clamp(29px, 4vw, 43px)/1.02 var(--display);
+      letter-spacing: -.035em; overflow-wrap: anywhere;
+    }
+    :lang(ar) .identity h2 { font-size: clamp(34px, 5vw, 51px); letter-spacing: normal; }
+    .identity p { margin-block-start: 5px; }
+    .initials {
+      flex: none; display: grid; place-items: center; width: 50px; height: 50px;
+      border-radius: 14px 14px 14px 3px; background: #d9efcb; color: #214333; font-weight: 900;
+    }
+    .risk {
+      display: inline-flex; align-items: center; color: #ffebc4; background: #393e2c;
+      border: 1px solid #8e7954; border-radius: 99px; padding: 6px 9px; font-size: 12px;
+    }
+    .risk::before { background: #ffc680; flex: none; }
+    .risk[data-level="pending"], .risk[data-level="low"] {
+      color: #e5f2e5; background: #214a3a; border-color: #739181;
+    }
+    .risk[data-level="pending"]::before, .risk[data-level="low"]::before { background: #a8d5a6; }
+    .metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-block: 23px 19px; }
+    .metric { border-block-start: 1px solid #ffffff37; padding-block-start: 14px; padding-inline-end: 9px; min-width: 0; }
+    .metric + .metric { border-inline-start: 1px solid #ffffff37; padding-inline-start: 14px; }
+    .metric p, .metric small { color: #e2eee5; font-size: 13px; line-height: 1.5; }
+    .metric strong {
+      display: block; margin-block: 3px;
+      font: 700 clamp(31px, 4.4vw, 48px)/1 var(--display); font-variant-numeric: tabular-nums;
+    }
+    .metric strong small { font-family: Tahoma, "Segoe UI", sans-serif; font-weight: 400; }
+    .actions { flex-wrap: wrap; margin-block-start: auto; }
+    .button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+      min-height: 46px; max-width: 100%; padding: 10px 14px;
+      background: var(--green); color: #fff; border: 1px solid transparent;
+      font-size: 14px; font-weight: 750; line-height: 1.4; border-radius: 9px;
+      text-align: center; text-decoration: none;
+      transition: background .18s, color .18s, transform .18s;
+    }
+    .button:hover:not(:disabled):not([aria-disabled="true"]) { background: #183f2e; }
+    .button:active:not(:disabled):not([aria-disabled="true"]) { transform: translateY(1px); }
+    .button:disabled, .button[aria-disabled="true"] { cursor: default; opacity: .6; }
+    .hero .button { background: var(--lime); color: var(--dark); }
+    .hero .button:hover:not(:disabled):not([aria-disabled="true"]) { background: #edfbbd; }
+    .button.subtle { background: #eef4e9; color: var(--green); border-color: var(--line); }
+    .button.subtle:hover:not(:disabled) { background: #e1ebdc; }
+    .hero .button.subtle { background: transparent; color: #fff; border-color: #789589; }
+    .hero .button.subtle:hover:not(:disabled) { background: #ffffff16; }
+    .arrow { display: inline-block; }
+    :root[dir="rtl"] .arrow { transform: scaleX(-1); }
+    .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px 15px; }
+    .section-head > p { color: var(--muted); font-size: 13px; line-height: 1.4; }
+    .integration {
+      margin-block-end: 18px;
+      border-inline-start: 4px solid var(--green);
+      background: #edf4e9;
+    }
+    .integration-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      flex-wrap: wrap; gap: 14px 24px;
+    }
+    .integration-title { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+    .integration-header p { margin-block-start: 7px; color: var(--muted); line-height: 1.55; }
+    .connection {
+      padding: 5px 9px; border-radius: 99px; background: #dce9d7; color: #234332;
+      font-size: 12px; font-weight: 750;
+    }
+    .connection[data-mode="verified"] { background: var(--green); color: #fff; }
+    .connection[data-mode="error"], .connection[data-mode="local"] { background: #f5e5cd; color: #644021; }
+    .priority-support {
+      margin-block-end: 18px; border-inline-start: 4px solid #9c5d31; background: #fbf0df;
+    }
+    .priority-support > p { color: var(--muted); margin-block-start: 5px; line-height: 1.55; }
+    .priority-support ol {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 195px), 1fr));
+      gap: 10px; padding: 0; list-style: none; margin: 13px 0 0;
+    }
+    .priority-support li { padding: 11px 13px; border: 1px solid #ead3b9; border-radius: 9px; background: var(--card); }
+    .priority-support li p { color: var(--muted); line-height: 1.55; font-size: 13px; margin-block-start: 4px; }
+    .pipeline {
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+      gap: 10px; margin-block-start: 16px;
+    }
+    .pipeline > div { padding: 13px 15px; border: 1px solid #cddcca; border-radius: 11px; background: var(--card); }
+    .pipeline h3 { font-size: 15px; margin-block-end: 5px; }
+    .pipeline p { color: var(--muted); font-size: 14px; line-height: 1.55; }
+    .pipeline a { display: inline-block; margin-block-start: 6px; font-size: 13px; font-weight: 700; }
+    .agent-resources { margin: 0; padding-inline-start: 20px; line-height: 1.7; }
+    .agent-resources a, .agent-resources summary { font-weight: 700; }
+    .agent-resources summary { cursor: pointer; }
+    .live-link { display: inline-block; margin-block-start: 7px; min-height: 28px; font-weight: 700; }
+    .chart {
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px;
+      margin-block-start: 15px;
+    }
+    .chart-point {
+      display: grid; grid-template-rows: 127px auto; gap: 8px; min-width: 0;
+      padding: 4px; border: 1px solid transparent; border-radius: 11px;
+      background: transparent; color: var(--muted); text-align: center;
+      font-size: 12px; line-height: 1.4;
+    }
+    .chart-point:disabled { cursor: default; }
+    .chart-point:hover:not(:disabled), .chart-point[aria-pressed="true"] { background: #edf4e9; border-color: #cbdcc8; color: var(--ink); }
+    .plot {
+      display: flex; align-items: end; justify-content: center;
+      border-block-end: 1px solid #bfd0c2;
+      background: repeating-linear-gradient(to top, transparent 0 30px, #dbe3d9 30px 31px);
+      min-width: 0;
+    }
+    .bar {
+      display: grid; place-items: start center; width: min(68%, 51px); min-width: 21px;
+      height: calc(var(--score) * 1%); padding-block-start: 8px; border-radius: 7px 7px 0 0;
+      background: #b2cfb6; color: #1b392c; font-weight: 800; font-size: 14px;
+      font-variant-numeric: tabular-nums; transform-origin: bottom;
+      animation: grow .35s ease-out both;
+    }
+    @keyframes grow { from { transform: scaleY(.15); opacity: .6; } }
+    .chart-point:nth-child(2) .bar { background: #edc591; color: #442c1b; }
+    .chart-point:nth-child(3) .bar { background: var(--green); color: #fff; }
+    .bar-pending { align-self: end; width: 48%; border-block-end: 2px dashed #81978a; margin-block-end: 10px; }
+    .chart-note {
+      min-height: calc(3.1em + 22px); margin-block-start: 13px; padding: 10px 12px;
+      border-inline-start: 3px solid var(--green); background: #f0f4ec;
+      border-radius: 3px; color: var(--muted); font-size: 13px; line-height: 1.55;
+    }
+    .path-card { grid-column: 1 / -1; }
+    .path-list, .agents { list-style: none; padding: 0; margin: 16px 0 0; }
+    .path-list { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; }
+    .path-list li + li { border-inline-start: 1px solid var(--line); }
+    .path-link {
+      display: flex; align-items: center; gap: 8px; min-height: 53px;
+      padding: 6px 9px; font-size: 13px; font-weight: 700; line-height: 1.4;
+      border-radius: 8px; text-decoration: none;
+    }
+    .path-link:hover { background: #edf4e9; }
+    .node-icon {
+      width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+      flex: none; color: var(--green); background: #e5eee2; font-weight: 800; font-size: 15px;
+    }
+    [data-state="active"] .node-icon { background: var(--lime); color: #254628; }
+    [data-state="done"] .node-icon { background: var(--green); color: #fff; }
+    .workflow-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .95fr); gap: 18px; align-items: start; }
+    .agent + .agent { margin-block-start: 5px; }
+    .agent-button {
+      display: flex; align-items: center; gap: 9px; min-height: 58px; width: 100%;
+      padding: 9px; border: 1px solid transparent; border-radius: 10px;
+      background: transparent; color: var(--ink); font-size: 14px;
+      font-weight: 750; text-align: start;
+    }
+    .agent-button:hover, .agent-button[aria-pressed="true"] { background: #edf4e9; border-color: #cbdcc8; }
+    .agent-title { flex: 1; min-width: 0; }
+    .status {
+      display: inline-block; max-width: 42%; padding: 4px 7px; border-radius: 7px;
+      color: #4b5c52; background: #eff1ea; font-size: 11px; text-align: center; line-height: 1.25;
+    }
+    [data-state="active"] .status { background: #edf3bf; color: #3c4b1c; }
+    [data-state="done"] .status { background: #e1efde; color: #214c36; }
+    [data-state="error"] .status { background: #fae8e2; color: #882e23; }
+    .detail { display: grid; gap: 13px; }
+    .detail .status { justify-self: start; max-width: 100%; }
+    .detail p, .report p { color: var(--muted); line-height: 1.7; }
+    .detail .actions, .report .actions { margin-block-start: 9px; }
+    .report { display: grid; gap: 17px; }
+    .report.pending { max-width: 640px; }
+    .followup-stack { display: grid; gap: 18px; }
+    .checkpoint-form, .checkpoint-fields, .student-form { display: grid; gap: 12px; }
+    .checkpoint-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .checkpoint-fields label, .student-form label { display: grid; gap: 5px; font-size: 14px; font-weight: 700; }
+    .checkpoint-fields input, .student-form input, .student-switch select {
+      width: 100%; min-height: 44px; padding: 8px; border: 1px solid #81978a; border-radius: 8px;
+      font: inherit; color: var(--ink); background: var(--card);
+    }
+    .student-switch {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px;
+      margin-block: -6px 18px; font-size: 14px; font-weight: 750;
+    }
+    .student-switch select { width: auto; max-width: 100%; min-width: 145px; }
+    .student-form { margin-block-start: 12px; }
+    .student-form fieldset { min-width: 0; margin: 0; border: 1px solid var(--line); border-radius: 10px; padding: 11px; }
+    .student-form legend { padding-inline: 4px; font-size: 14px; font-weight: 750; }
+    .student-form .actions { margin-block-start: 3px; }
+    .student-list { list-style: none; padding: 0; margin: 15px 0 0; display: grid; gap: 8px; }
+    .student-list button {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+      gap: 4px 12px; width: 100%; min-height: 49px; padding: 8px 12px; text-align: start;
+      background: #edf4e9; color: var(--ink); border: 1px solid var(--line); border-radius: 8px;
+    }
+    .student-list button:hover:not(:disabled) { border-color: #86aa8b; }
+    .student-list small { color: var(--muted); }
+    .form-hint { color: var(--muted); font-size: 14px; line-height: 1.55; }
+    .form-error { color: #882e23; font-size: 14px; line-height: 1.55; }
+    .roadmap-list {
+      display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px;
+      padding: 0; list-style: none; margin: 16px 0 0;
+    }
+    .roadmap-list li { padding: 15px; border: 1px solid var(--line); border-radius: 11px; min-width: 0; }
+    .roadmap-list li[data-week-state="next"] { background: #edf4e9; border-color: #86aa8b; }
+    .roadmap-list p { font-size: 13px; margin-block-start: 7px; line-height: 1.5; color: var(--muted); }
+    .roadmap-list h3 { font-size: 16px; }
+    .roadmap-list .status { max-width: 100%; }
+    .comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .comparison > div { border: 1px solid var(--line); border-radius: 12px; padding: 13px; }
+    .comparison strong { display: block; margin-block: 3px; font-size: clamp(19px, 3vw, 33px); color: var(--green); font-variant-numeric: tabular-nums; }
+    .comparison small { color: var(--muted); line-height: 1.5; }
+    .plan { background: #edf4e9; border-color: #ccdcca; }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+    }
+    @media (max-width: 800px) {
+      .dashboard, .workflow-grid { grid-template-columns: 1fr; }
+      .path-card { grid-column: auto; }
+      .roadmap-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 560px) {
+      .shell { width: calc(100% - 28px); }
+      .top { min-height: 65px; gap: 9px; }
+      .brand, .header-controls { gap: 7px; }
+      .brand { font-size: 17px; }
+      .brand-mark { width: 28px; height: 28px; font-size: 21px; }
+      .demo { font-size: 11px; }
+      h1 { font-size: clamp(32px, 10vw, 44px); }
+      .site-nav { gap: 4px; }
+      .site-nav a { flex: 1; min-width: 0; gap: 4px; font-size: 12px; overflow-wrap: anywhere; }
+      .path-list { grid-template-columns: 1fr; }
+      .path-list li + li { border-inline-start: 0; border-block-start: 1px solid var(--line); }
+      .path-link { min-height: 44px; }
+      .hero .actions .button { flex: 1 1 100%; }
+      .pipeline { grid-template-columns: 1fr; }
+      .roadmap-list { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 430px) {
+      .header-controls { flex-direction: column; align-items: end; }
+      .nav-mark { display: none; }
+    }
+    @media (max-width: 360px) {
+      .chart-point { padding-inline: 2px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" id="skip" href="#main" data-copy="skip">انتقل إلى المحتوى</a>
+  <header class="masthead">
+    <div class="shell top">
+      <a class="brand" href="#overview"><span class="brand-mark" aria-hidden="true">✳</span><bdi>EduMind AI</bdi></a>
+      <div class="header-controls">
+        <span class="demo" id="case-source">بيانات تجريبية</span>
+        <label class="sr-only" for="language" data-copy="language">لغة الواجهة</label>
+        <select class="language" id="language">
+          <option value="ar" lang="ar">العربية</option>
+          <option value="en" lang="en">English</option>
+          <option value="uk" lang="uk">Українська</option>
+        </select>
+      </div>
+    </div>
+  </header>
+  <div class="nav-band">
+    <nav class="shell site-nav" data-label="navigation" aria-label="أقسام اللوحة">
+      <a href="#overview" data-route="overview" aria-current="page"><span class="nav-mark" aria-hidden="true">▦</span><span data-copy="overview">نظرة عامة</span></a>
+      <a href="#students" data-route="students"><span class="nav-mark" aria-hidden="true">▤</span><span data-copy="students">الطلاب</span></a>
+      <a href="#workflow" data-route="workflow"><span class="nav-mark" aria-hidden="true">◎</span><span data-copy="workflow">مسار الوكلاء</span></a>
+      <a href="#followup" data-route="followup"><span class="nav-mark" aria-hidden="true">↗</span><span data-copy="followup">المتابعة</span></a>
+    </nav>
+  </div>
+  <main class="shell" id="main">
+    <div class="intro">
+      <h1 id="heading" tabindex="-1">لوحة المعلّم</h1>
+      <p id="introduction">تابع حالة الطالب من رصد التراجع إلى تقييم أثر خطة الدعم.</p>
+        <a class="live-link" href="n8n-flow.html" data-copy="workflowMap">شاهد مخطط n8n</a>
+    </div>
+
+    <div class="student-switch" id="student-switch">
+      <label for="student-picker" data-copy="activeStudent">الطالب الحالي</label>
+      <select id="student-picker"></select>
+      <a href="#students" data-copy="addStudent">إضافة طالب</a>
+    </div>
+
+    <section class="card integration" id="integration" aria-labelledby="integration-title">
+      <div class="integration-header">
+        <div>
+          <div class="integration-title">
+            <h2 id="integration-title" data-copy="integrationTitle">نتائج الرصد والتشخيص</h2>
+            <span class="connection" id="connection" role="status"></span>
+          </div>
+          <p id="connection-note"></p>
+          <a class="live-link" id="live-link" href="http://127.0.0.1:8080/" data-copy="liveLink" hidden>افتح اللوحة المتصلة بـ n8n</a>
+        </div>
+        <div class="actions">
+          <button class="button" id="run" type="button" data-action="run"><span>تشغيل تحليل الوكلاء</span><span class="arrow" aria-hidden="true">→</span></button>
+          <a class="button subtle" href="#followup" id="toFollowup" hidden><span data-copy="openFollowup">انتقل إلى المتابعة</span><span class="arrow" aria-hidden="true">→</span></a>
+        </div>
+      </div>
+      <div class="pipeline">
+        <div>
+          <h3 id="summary-detection-title">رصد التراجع</h3>
+          <p id="summary-detection"></p>
+        </div>
+        <div>
+          <h3 id="summary-diagnosis-title">تشخيص الحالة</h3>
+          <p id="summary-diagnosis"></p>
+        </div>
+        <div id="plan-preview" hidden>
+          <h3 id="summary-plan-title"></h3>
+          <p id="summary-plan"></p>
+          <a href="#workflow/3" data-copy="openPlan">عرض خطة التدخّل</a>
+        </div>
+        <div id="resources-preview" hidden>
+          <h3 id="summary-resources-title"></h3>
+          <p id="summary-resources"></p>
+          <a href="#workflow/4" data-copy="openResources">عرض الموارد</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="card priority-support" id="priority-support" aria-labelledby="priority-title" hidden>
+      <h2 id="priority-title" data-copy="priorityTitle">إجراءات الدعم للحالات عالية الخطر</h2>
+      <p data-copy="priorityIntro">ابدأ بالأولوية الأولى وراجع الأثر في القياس القادم.</p>
+      <ol id="priority-actions"></ol>
+    </section>
+
+    <section class="screen dashboard" id="screen-overview" aria-labelledby="heading">
+      <section class="card hero" aria-labelledby="student">
+        <div class="section-head">
+          <span class="case-label" data-copy="caseLabel">حالة الطالب</span>
+          <span class="risk" id="risk" data-level="pending">بانتظار تقييم الخطر</span>
+        </div>
+        <div class="identity">
+          <span class="initials" id="student-initials" aria-hidden="true">آخ</span>
+          <div><h2 id="student" dir="auto">آدم خليل</h2><p id="student-description">الصف الثامن</p></div>
+        </div>
+        <div class="metrics">
+          <div class="metric">
+            <p data-copy="math">علامة الرياضيات</p>
+            <strong><bdi id="score">54</bdi> <small data-copy="scoreUnit">من 100</small></strong>
+            <small id="scoreChange">العلامة السابقة 82</small>
+          </div>
+          <div class="metric">
+            <p data-copy="attendance">الحضور الأسبوعي</p>
+            <strong><bdi id="days">3</bdi> <small data-copy="daysUnit">من 5 أيام</small></strong>
+            <small id="daysChange">الحضور السابق 5 أيام</small>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="button subtle" id="follow" type="button" data-action="follow" disabled><span>افتح خطة 8 أسابيع</span></button>
+        </div>
+      </section>
+
+      <section class="card trend" aria-labelledby="trend">
+        <div class="section-head"><h2 id="trend" data-copy="trend">أداء الرياضيات</h2><p data-copy="outOf">من 100</p></div>
+        <div class="chart" id="chart">
+          <button class="chart-point" type="button" aria-pressed="false">
+            <span class="plot"><span class="bar" id="previous-bar" style="--score:82">82</span></span>
+            <span data-copy="previous">القياس السابق</span>
+          </button>
+          <button class="chart-point" type="button" aria-pressed="true">
+            <span class="plot"><span class="bar" id="baseline-bar" style="--score:54">54</span></span>
+            <span data-copy="detected">عند الرصد</span>
+          </button>
+          <button class="chart-point" type="button" aria-pressed="false" disabled>
+            <span class="plot"><span class="bar" id="followBar" hidden></span><span class="bar-pending" aria-hidden="true"></span></span>
+            <span id="follow-caption">آخر قياس</span>
+          </button>
+        </div>
+        <p class="chart-note" id="chartDetail" aria-live="polite"></p>
+      </section>
+
+      <section class="card path-card" aria-labelledby="path-heading">
+        <div class="section-head"><h2 id="path-heading" data-copy="casePath">مراحل الحالة</h2><p id="overviewProgress">اكتمل 0 من 5</p></div>
+        <ol class="path-list" id="path"></ol>
+      </section>
+    </section>
+
+    <section class="screen workflow-grid" id="screen-students" aria-labelledby="heading" hidden>
+      <section class="card" aria-labelledby="roster-heading">
+        <h2 id="roster-heading" data-copy="rosterTitle">سجلّ الطلاب</h2>
+        <p class="form-hint" id="roster-note" data-copy="storageNote">السجل محفوظ في هذا المتصفح. استخدم رموزًا بدل الأسماء الكاملة.</p>
+        <div class="actions"><button class="button subtle" id="load-shared" type="button" data-copy="loadShared">تحميل سجل Google Sheets</button></div>
+        <p class="form-hint" id="shared-status" role="status"></p>
+        <ul class="student-list" id="student-list"></ul>
+      </section>
+      <section class="card" aria-labelledby="new-student-heading">
+        <h2 id="new-student-heading" data-copy="addStudent">إضافة طالب</h2>
+        <form class="student-form" id="student-form" aria-describedby="measurement-help">
+          <label><span data-copy="studentCode">رمز الطالب</span><input id="new-code" dir="ltr" type="text" minlength="3" maxlength="24" pattern="[A-Za-z0-9_\-]{3,24}" placeholder="S-001" autocomplete="off" required></label>
+          <p class="form-hint" id="measurement-help" data-copy="measurementHelp">خذ العلامة من اختبار قصير على المقياس نفسه، والحضور من سجلّ الأسبوع. 12 من 15 تساوي 80 من 100.</p>
+          <fieldset><legend data-copy="previous">القياس السابق</legend>
+            <div class="checkpoint-fields">
+              <label><span data-copy="math">علامة الرياضيات</span><input id="new-previous-score" type="number" min="0" max="100" step="1" required></label>
+              <label><span data-copy="attendance">الحضور الأسبوعي</span><input id="new-previous-days" type="number" min="0" max="5" step="1" required></label>
+            </div>
+          </fieldset>
+          <fieldset><legend data-copy="baseline">خط الأساس</legend>
+            <div class="checkpoint-fields">
+              <label><span data-copy="math">علامة الرياضيات</span><input id="new-current-score" type="number" min="0" max="100" step="1" required></label>
+              <label><span data-copy="attendance">الحضور الأسبوعي</span><input id="new-current-days" type="number" min="0" max="5" step="1" required></label>
+            </div>
+          </fieldset>
+          <fieldset><legend data-copy="optionalEvidence">أدلة اختيارية للتشخيص</legend>
+            <div class="checkpoint-fields">
+              <label><span data-copy="quizCorrect">إجابات الكسور الصحيحة</span><input id="new-quiz-correct" type="number" min="0" max="100" step="1"></label>
+              <label><span data-copy="quizTotal">عدد أسئلة اختبار الكسور</span><input id="new-quiz-total" type="number" min="1" max="100" step="1"></label>
+              <label><span data-copy="busDays">أيام الغياب المتزامنة مع تأخّر الحافلة</span><input id="new-bus" type="number" min="0" max="5" step="1"></label>
+            </div>
+          </fieldset>
+          <p class="form-error" id="student-form-error" role="alert" hidden></p>
+          <div class="actions"><button class="button" id="save-student" type="submit" data-copy="saveStudent">احفظ الطالب وافتح حالته</button></div>
+        </form>
+      </section>
+    </section>
+
+    <section class="screen workflow-grid" id="screen-workflow" aria-labelledby="heading" hidden>
+      <section class="card" aria-labelledby="steps-heading">
+        <div class="section-head"><h2 id="steps-heading" data-copy="stages">مراحل التحليل</h2><p id="progress">اكتمل 0 من 5</p></div>
+        <ol class="agents" id="agents"></ol>
+      </section>
+      <section class="card detail" id="agent-detail" aria-labelledby="agent-heading">
+        <span class="status" id="agentStatus"></span>
+        <h2 id="agent-heading" tabindex="-1"></h2>
+        <p id="agentResult"></p>
+        <p class="chart-note" id="ai-advice" hidden></p>
+        <ul class="agent-resources" id="agent-resources" hidden>
+          <li data-resource="fraction-video">
+            <a href="https://www.khanacademy.org/math/arithmetic/fraction-arithmetic/modal/v/adding-small-fractions-with-unlike-denominators" data-copy="fractionVideo">فيديو جمع الكسور بالإنجليزية</a>
+          </li>
+          <li data-resource="fraction-practice">
+            <details><summary><span data-copy="fractionPractice">اجمع الكسرين</span> <bdi dir="ltr">1/2 + 1/3</bdi></summary>
+              <p><span data-copy="practiceSolution">وحّد المقامين، ثم اجمع البسطين.</span> <bdi dir="ltr">1/2 + 1/3 = 3/6 + 2/6 = 5/6</bdi></p>
+            </details>
+          </li>
+          <li data-resource="review-checklist" data-copy="reviewChecklist">راجع آخر اختبار وحدّد سؤالًا يحتاج الطالب إلى إعادة حلّه.</li>
+        </ul>
+      </section>
+    </section>
+
+    <section class="screen followup-stack" id="screen-followup" aria-labelledby="heading" hidden>
+      <section class="card report pending" id="pending">
+        <h2 id="pendingTitle"></h2>
+        <p id="pendingText"></p>
+        <a class="button subtle" id="backToWorkflow" href="#workflow" data-copy="openWorkflow">انتقل إلى مسار الوكلاء</a>
+        <form class="checkpoint-form" id="checkpoint-form" hidden>
+          <div class="checkpoint-fields">
+            <label><span data-copy="math">علامة الرياضيات</span><input id="checkpoint-score" type="number" min="0" max="100" step="1" required></label>
+            <label><span data-copy="attendance">الحضور الأسبوعي</span><input id="checkpoint-attendance" type="number" min="0" max="5" step="1" required></label>
+          </div>
+          <p class="form-hint" id="checkpoint-source"></p>
+          <div class="actions"><button class="button" id="review" type="submit"><span></span><span class="arrow" aria-hidden="true">→</span></button></div>
+        </form>
+      </section>
+      <div class="dashboard" id="report" hidden>
+        <section class="card report" aria-labelledby="comparison">
+          <div class="section-head"><h2 id="comparison" tabindex="-1"></h2><p id="evaluation-source"></p></div>
+          <div class="comparison">
+            <div><p data-copy="math">علامة الرياضيات</p><strong><bdi id="math-comparison"></bdi></strong><small id="math-delta"></small></div>
+            <div><p data-copy="attendance">الحضور الأسبوعي</p><strong><bdi id="attendance-comparison"></bdi></strong><small id="attendance-delta"></small></div>
+          </div>
+          <a class="button subtle" href="#overview" data-copy="openOverview">العودة إلى النظرة العامة</a>
+        </section>
+        <section class="card report plan" aria-labelledby="plan">
+          <h2 id="plan" data-copy="plan">خطة الدعم المحدّثة</h2>
+          <p id="updated-plan"></p>
+          <a class="button subtle" href="#workflow/5" data-copy="openEvaluation">عرض تقييم الوكيل</a>
+        </section>
+      </div>
+      <section class="card" id="roadmap-panel" aria-labelledby="roadmap-title" hidden>
+        <div class="section-head"><h2 id="roadmap-title" data-copy="roadmapTitle">خطة الدعم لثمانية أسابيع</h2><p id="roadmap-progress"></p></div>
+        <ol class="roadmap-list" id="roadmap"></ol>
+      </section>
+    </section>
+    <div id="announcement" class="sr-only" role="status"></div>
+  </main>
+  <script src="detection.js"></script>
+  <script src="diagnosis.js"></script>
+  <script src="intervention.js"></script>
+  <script>
+    const copy = {
+      ar: {
+        skip: 'انتقل إلى المحتوى', language: 'لغة الواجهة', navigation: 'أقسام اللوحة',
+        demo: 'بيانات تجريبية', overview: 'نظرة عامة', workflow: 'مسار الوكلاء', followup: 'المتابعة',
+        workflowMap: 'شاهد مخطط n8n',
+        hostedMode: ['تشغيل متصفحي', 'تعمل قواعد الوكلاء في هذا المتصفح. القياسات المدخلة تبقى فيه.'],
+        loadShared: "تحميل سجل Google Sheets",
+        sharedLoading: "جارٍ تحميل سجل Google Sheets…",
+        sharedReady: "تم تحميل سجلات Google Sheets.",
+        sharedNotConfigured: "ربط Google Sheets بانتظار إعداد بيانات الاعتماد على الخادم.",
+        sharedUnavailable: "تعذّر قراءة سجل Google Sheets أو حفظه.",
+        sharedConflict: "تغيّر الأسبوع في سجلّ Sheets. أعد تحميل السجل وافتح حالة الطالب.",
+        aiTitle: "اقتراح تشخيصي من OpenAI",
+        aiNotConfigured: "تشخيص OpenAI بانتظار إعداد الخادم.",
+        aiUnavailable: "اقتراح OpenAI غير متاح لهذه المحاولة.",
+        aiActions: {
+          'worked-example': "حلّ مثالًا على توحيد المقام مع الطالب، ثم اطلب منه حل مثال مماثل.",
+          'explain-steps': "اطلب من الطالب شرح خطوات جمع كسرين لتحديد موضع الصعوبة.",
+          'short-skill-check': "استخدم سؤالين قصيرين من الدرس الأخير وحدّد أول مهارة تحتاج إلى مراجعة.",
+          'attendance-log': "راجع تواريخ الغياب وحدّد العائق بالاستناد إلى السجل والحديث مع الطالب.",
+          'compare-transit-log': "طابق تواريخ الغياب مع سجل النقل وتحقّق من التزامن.",
+        },
+        priorityTitle: "إجراءات الدعم للحالات عالية الخطر",
+        priorityIntro: "ابدأ بالأولوية الأولى وراجع الأثر في القياس القادم.",
+        priorityActions: {
+          'teacher-check-in': ["لقاء قصير خلال يومين دراسيين","اسأل الطالب عمّا صعّب عليه التعلّم أو الحضور واتّفق معه على إجراء واحد يمكن تنفيذه."],
+          'fraction-practice': ["ركّز على الكسور","ابدأ بتوحيد المقامات، ثم اجمع كسورًا بسيطة واطلب من الطالب شرح خطواته."],
+          'math-check': ["حدّد المهارة المتعثّرة","استخدم أسئلة قصيرة من الدرس الأخير واختر مهارة واحدة تبني عليها جلسة الدعم."],
+          'attendance-check': ["تحقّق من الحضور","راجع أيام الغياب وسجّل العائق المثبت ومن سيتابع حلّه وفق إجراءات المدرسة."],
+          'transport-check': ["راجع تأخّر الحافلة","طابق أيام الغياب مع سجل النقل وتحقّق من العائق قبل الاعتماد عليه في الخطة."],
+          'weekly-review': ["راجع التقدّم بعد أسبوع","استخدم اختبارًا قريبًا في الصعوبة وقارن العلامة وأيام الحضور. عدّل الدعم حسب القياس."],
+        },
+        students: "الطلاب",
+        studentsIntro: "أضف قياسات كل طالب وارجع إلى خطته الأسبوعية من السجلّ.",
+        activeStudent: "الطالب الحالي",
+        addStudent: "إضافة طالب",
+        rosterTitle: "سجلّ الطلاب",
+        storageNote: "الإدخالات اليدوية تُحفظ في هذا المتصفح، وسجلات Sheets تُحفظ في المصنّف. استخدم رموزًا بدل الأسماء الكاملة.",
+        studentCode: "رمز الطالب",
+        measurementHelp: "خذ العلامة من اختبار قصير على المقياس نفسه، والحضور من سجلّ الأسبوع. مثلًا، 12 من 15 تساوي 80 من 100.",
+        baseline: "خط الأساس (الأسبوع الأول)",
+        optionalEvidence: "أدلة اختيارية للتشخيص",
+        quizCorrect: "إجابات الكسور الصحيحة",
+        quizTotal: "عدد أسئلة اختبار الكسور",
+        busDays: "أيام الغياب المتزامنة مع تأخّر الحافلة",
+        saveStudent: "احفظ الطالب وافتح حالته",
+        manualCase: "قياسات مُدخلة يدويًا",
+        sampleStudent: "آدم · حالة تجريبية",
+        noStudents: "السجل فارغ. أضف أول طالب من النموذج.",
+        duplicateStudent: "هذا الرمز مستخدم. اختر رمزًا مختلفًا.",
+        invalidEvidence: "أدخل الصحيح والإجمالي معًا. الصحيح لا يتجاوز الإجمالي، وأيام تأخّر الحافلة لا تتجاوز أيام الغياب.",
+        storageError: "تعذّر الحفظ في المتصفح. تحقّق من إعدادات التخزين وأعد المحاولة.",
+        storageConflict: "تغيّر هذا السجل في تبويب آخر. افتح حالة الطالب من السجلّ ثم أعد المحاولة.",
+        manualCheckpoint: "أدخل نتيجة اختبار الأسبوع من 100 وعدد أيام الحضور من 5.",
+        sampleCheckpoint: "هذه قيم تجريبية قابلة للتعديل.",
+        comparedWithPrevious: "التغيّر مقارنة بالقياس السابق",
+        integrationTitle: 'نتائج الوكلاء', liveLink: 'افتح اللوحة المتصلة بـ n8n',
+        openPlan: 'عرض خطة التدخّل', openResources: 'عرض الموارد',
+        fractionVideo: 'فيديو جمع الكسور من Khan Academy (بالإنجليزية)',
+        fractionPractice: 'اجمع الكسرين', practiceSolution: 'وحّد المقامين، ثم اجمع البسطين.',
+        reviewChecklist: 'راجع آخر اختبار وحدّد سؤالًا يحتاج الطالب إلى إعادة حلّه.',
+        planSession: (sessions, minutes) => sessions === 1 ? 'جلسة دعم واحدة مدتها ' + minutes + ' دقيقة.' : sessions + ' جلسات دعم خلال أسبوع، ' + minutes + ' دقيقة لكل جلسة.',
+        planFocus: {
+          fractions: 'تدرّب على توحيد المقامات وجمع الكسور.',
+          review: 'راجع أخطاء آخر اختبار وحدّد المهارة التي تحتاج إلى دعم.',
+          monitor: 'تابع العلامة والحضور في القياس القادم.',
+          'word-problems': 'ركّز في جلسات الدعم القادمة على المسائل الكلامية التي تتطلب جمع الكسور.',
+          'mixed-review': "راجع مسائل متنوعة في جمع الكسور ودرّب الطالب على الأخطاء المتكررة.",
+          independent: "حلّ مجموعة مسائل باستقلالية واشرح طريقة الحل.",
+        },
+        resourcesText: { fractions: 'فيديو شرح وتمرين جمع كسور مع الحل.', review: 'قائمة قصيرة لمراجعة الاختبار.', monitor: 'المتابعة تكفي لهذه الحالة.' },
+        roadmapTitle: "خطة الدعم لثمانية أسابيع",
+        weekLabel: week => "الأسبوع " + week,
+        reviewWeek: week => "قيّم الأسبوع " + week,
+        weekReport: week => "نتائج الأسبوع " + week,
+        roadmapProgress: count => "سُجّل القياس في " + count + " من 8 أسابيع",
+        roadmapStates: { baseline: "خط الأساس", measured: "تم القياس", next: "الأسبوع التالي", planned: "مخطط" },
+        roadmapTarget: (math, days) => "الهدف " + math + " من 100 وحضور " + days + " من 5 أيام.",
+        roadmapReady: 'سجّل قياسات الأسبوع ثم قيّمها لتحديث خطة المتابعة.',
+        roadmapComplete: "اكتملت متابعة 8 أسابيع.",
+        evaluating: "جارٍ تقييم الأسبوع…", evaluationError: "تعذّر تقييم هذا الأسبوع. أعد المحاولة.",
+        evaluationResult: (score, days) => 'الرياضيات ' + score + ' من 100، والحضور ' + days + ' من 5 أيام.',
+        sinceDetection: 'التغيّر منذ الرصد',
+        connection: {
+          ready: ['وضع n8n', 'شغّل التحليل لعرض الرصد والتشخيص وخطة التدخّل والموارد.'],
+          running: ['بانتظار n8n', 'اللوحة تنتظر نتائج الوكلاء من n8n.'],
+          verified: ['نتائج مؤكّدة من n8n', 'وصلت نتائج الوكلاء. افتح خطة 8 أسابيع لعرض الأهداف وتسجيل القياسات.'],
+          local: ['عرض محلي', 'يعمل الحساب في المتصفح. افتح اللوحة المتصلة لتشغيل المسار عبر n8n.'],
+          error: ['تعذّر تنفيذ التحليل', 'لم تصل نتيجة صالحة من n8n. أعد تشغيل التحليل للمحاولة مرة أخرى.'],
+        },
+        heading: 'لوحة المعلّم', overviewIntro: 'تابع حالة الطالب من رصد التراجع إلى تقييم أثر خطة الدعم.',
+        workflowIntro: 'اختر أي وكيل للاطّلاع على مهمته ونتيجة عمله.',
+        followupIntro: 'تابع العلامة والحضور أسبوعيًا واضبط خطة الدعم حسب النتائج.',
+        caseLabel: 'حالة الطالب', student: 'آدم خليل', initials: 'آخ', grade: 'الصف الثامن',
+        risks: { pending: 'بانتظار تقييم الخطر', high: 'خطر مرتفع عند الرصد', watch: 'يحتاج إلى متابعة', low: 'خطر منخفض وفق قواعد الرصد' },
+        detectionResult: (math, attendance, risk) => 'تغيّر علامة الرياضيات: ' + math + ' نقطة. تغيّر الحضور: ' + attendance + ' يوم. ' + risk + '.',
+        fractionClue: (correct, total) => 'كانت الإجابات الصحيحة ' + correct + ' من ' + total + ' في اختبار الكسور. تشير النتيجة إلى حاجة لدعم في الكسور.',
+        learningAssessment: {
+          'no-signal': 'لم تُشر نتيجة اختبار الكسور إلى حاجة لدعم إضافي في هذا التقييم.',
+          unknown: 'لا توجد نتيجة لاختبار الكسور في هذه الحالة.',
+          skipped: 'لم تستدعِ نتيجة الرصد تشخيصًا إضافيًا.',
+        },
+        transportAssessment: {
+          'possible-factor': 'تزامن تأخّر الحافلة في سجل النقل مع الغياب. هذا عامل محتمل يحتاج إلى تحقق.',
+          'no-signal': 'لم يُظهر سجل النقل إشارة تفسّر تراجع الحضور.',
+          unknown: 'لا توجد بيانات نقل لهذه الحالة.',
+          skipped: '',
+        },
+        math: 'علامة الرياضيات', attendance: 'الحضور الأسبوعي',
+        scoreUnit: 'من 100', daysUnit: 'من 5 أيام', scoreBefore: score => 'العلامة السابقة ' + score,
+        daysBefore: days => 'الحضور السابق ' + days + ' من 5 أيام',
+        trend: 'أداء الرياضيات', outOf: 'من 100', previous: 'القياس السابق', detected: 'عند الرصد',
+        latestMeasurement: 'آخر قياس', casePath: 'مراحل الحالة', stages: 'مراحل التحليل',
+        run: 'تشغيل تحليل الوكلاء', running: 'التحليل جارٍ…', replay: 'إعادة تشغيل التحليل',
+        openFollowup: 'افتح خطة 8 أسابيع', openWorkflow: 'انتقل إلى مسار الوكلاء',
+        openOverview: 'العودة إلى النظرة العامة', openEvaluation: 'عرض تقييم الوكيل',
+        plan: 'خطة الدعم المحدّثة',
+        queued: 'بانتظار البدء', active: 'قيد المعالجة', done: 'مكتمل', waiting: 'بانتظار المتابعة',
+        error: 'تعذّر الرصد', detectionError: 'تعذّر تشغيل وكيل الرصد. أعد تشغيل التحليل.',
+        progress: (count, total) => 'اكتمل ' + count + ' من ' + total,
+        pending: 'أكمل تحليل الوكلاء أولًا لعرض خطة الدعم الأسبوعية.',
+        inProgress: 'التحليل جارٍ الآن. ستظهر خطة الدعم الأسبوعية بعد اكتماله.',
+        ready: 'اكتمل التحليل. خطة الدعم لثمانية أسابيع جاهزة.',
+        agents: [
+          ['رصد التراجع', 'يقارن العلامة والحضور بين الأسبوعين ويحسب مستوى الخطر وفق قواعد الديمو.'],
+          ['تشخيص الحالة', 'يستخدم نتيجة الرصد وبيانات اختبار الكسور والنقل لتحديد ما يحتاج إلى متابعة.'],
+          ['تخطيط التدخّل', 'يضع جدولًا لجلسات الدعم بناءً على التشخيص.'],
+          ['اختيار الموارد', 'يقترح مواد تدريبية تناسب خطة الدعم.'],
+          ['تقييم الأثر', 'يقارن القياس الأسبوعي ببيانات الرصد ويحدّث خطة الدعم.']
+        ]
+      },
+      en: {
+        skip: 'Skip to content', language: 'Interface language', navigation: 'Dashboard sections',
+        demo: 'Demo data', overview: 'Overview', workflow: 'Agent workflow', followup: 'Follow-up',
+        workflowMap: 'View the n8n workflow',
+        hostedMode: ['Browser mode', 'Agent rules run in this browser. Measurements are kept here.'],
+        loadShared: "Load Google Sheets roster",
+        sharedLoading: "Loading the Google Sheets roster…",
+        sharedReady: "Google Sheets records loaded.",
+        sharedNotConfigured: "Google Sheets is waiting for server credentials.",
+        sharedUnavailable: "Could not read or save the Google Sheets roster.",
+        sharedConflict: "This week changed in Sheets. Reload the roster and reopen the case.",
+        aiTitle: "Diagnostic suggestion from OpenAI",
+        aiNotConfigured: "OpenAI diagnosis is waiting for server configuration.",
+        aiUnavailable: "The OpenAI suggestion is unavailable for this attempt.",
+        aiActions: {
+          'worked-example': "Work through one common-denominator example, then ask the student to try a similar problem.",
+          'explain-steps': "Ask the student to explain how they add two fractions to locate the difficulty.",
+          'short-skill-check': "Use two short questions from the latest lesson to identify the first skill to review.",
+          'attendance-log': "Review absence dates and check the barrier against the attendance log and a student conversation.",
+          'compare-transit-log': "Compare absence dates with the transport log and verify the overlap.",
+        },
+        priorityTitle: "Support actions for high-risk cases",
+        priorityIntro: "Start with the first priority and review progress at the next checkpoint.",
+        priorityActions: {
+          'teacher-check-in': ["Check in within two school days","Ask the student what made learning or attendance harder and agree on one action you can take."],
+          'fraction-practice': ["Focus on fractions","Start with common denominators, then add simple fractions and ask the student to explain the steps."],
+          'math-check': ["Find the skill that needs help","Use a few questions from the latest lesson and choose one skill to address in the support session."],
+          'attendance-check': ["Check attendance","Review absence dates and record the verified barrier and who will follow up using the school’s process."],
+          'transport-check': ["Review the bus delay","Compare absence dates with the transit log and verify the barrier before using it in the plan."],
+          'weekly-review': ["Review progress after one week","Use a quiz of similar difficulty and compare the score and days attended. Adjust support as needed."],
+        },
+        students: "Students",
+        studentsIntro: "Add student measurements and return to each weekly plan from the roster.",
+        activeStudent: "Current student",
+        addStudent: "Add student",
+        rosterTitle: "Student roster",
+        storageNote: "Manual records stay in this browser. Sheets records are saved in the workbook. Use student codes in place of full names.",
+        studentCode: "Student code",
+        measurementHelp: "Use a short quiz on the same scale and the weekly attendance log. For example, 12 out of 15 is 80 out of 100.",
+        baseline: "Baseline (week one)",
+        optionalEvidence: "Optional diagnosis evidence",
+        quizCorrect: "Correct fraction answers",
+        quizTotal: "Total fraction questions",
+        busDays: "Absences that coincided with a late bus",
+        saveStudent: "Save student and open case",
+        manualCase: "Manually entered measurements",
+        sampleStudent: "Adam · Demo case",
+        noStudents: "The roster is empty. Add your first student using the form.",
+        duplicateStudent: "This code is already in use. Choose a different code.",
+        invalidEvidence: "Enter both quiz counts. Correct answers cannot exceed the total, and late-bus days cannot exceed absences.",
+        storageError: "Could not save in this browser. Check storage settings and try again.",
+        storageConflict: "This record changed in another tab. Open the student case from the roster and try again.",
+        manualCheckpoint: "Enter the weekly quiz score out of 100 and days attended out of 5.",
+        sampleCheckpoint: "These are editable demo values.",
+        comparedWithPrevious: "Change from previous measurement",
+        integrationTitle: 'Agent results', liveLink: 'Open the n8n-connected dashboard',
+        openPlan: 'View the intervention plan', openResources: 'View learning resources',
+        fractionVideo: 'Khan Academy video on adding fractions (English)',
+        fractionPractice: 'Add the fractions', practiceSolution: 'Find a common denominator, then add the numerators.',
+        reviewChecklist: 'Review the latest quiz and select a problem for the student to try again.',
+        planSession: (sessions, minutes) => sessions + (sessions === 1 ? ' support session, ' : ' support sessions over one week, ') + minutes + ' minutes each.',
+        planFocus: {
+          fractions: 'Practice finding common denominators and adding fractions.',
+          review: 'Review errors on the latest quiz and identify the skill that needs support.',
+          monitor: 'Check the math score and attendance at the next measurement.',
+          'word-problems': 'Focus the next support sessions on word problems that involve adding fractions.',
+          'mixed-review': "Review a mixed set of fraction problems and practice recurring errors.",
+          independent: "Solve a set of problems independently and explain the method.",
+        },
+        resourcesText: { fractions: 'An explainer video and a worked fraction exercise.', review: 'A short quiz review checklist.', monitor: 'Continue monitoring this case.' },
+        roadmapTitle: "Eight-week support plan",
+        weekLabel: week => "Week " + week,
+        reviewWeek: week => "Evaluate week " + week,
+        weekReport: week => "Results for week " + week,
+        roadmapProgress: count => "" + count + " of 8 weeks measured",
+        roadmapStates: { baseline: "Baseline", measured: "Measured", next: "Next week", planned: "Planned" },
+        roadmapTarget: (math, days) => "Target: " + math + " out of 100 and " + days + " of 5 days attended.",
+        roadmapReady: 'Record this week’s measurements, then evaluate them to update the support plan.',
+        roadmapComplete: "All 8 weeks of follow-up are complete.",
+        evaluating: "Evaluating the week…", evaluationError: "The weekly evaluation failed. Try again.",
+        evaluationResult: (score, days) => 'Math: ' + score + ' out of 100. Attendance: ' + days + ' out of 5 days.',
+        sinceDetection: 'Change since detection',
+        connection: {
+          ready: ['n8n mode', 'Run the analysis to see detection, diagnosis, the intervention plan and learning resources.'],
+          running: ['Waiting for n8n', 'Waiting for agent results from n8n.'],
+          verified: ['Results from n8n', 'The agent results are ready. Open the 8-week plan to see targets and record measurements.'],
+          local: ['Local preview', 'The analysis runs in your browser. Open the connected dashboard to run it through n8n.'],
+          error: ['Analysis unavailable', 'n8n did not return a valid result. Run the analysis again to retry.'],
+        },
+        heading: 'Teacher dashboard', overviewIntro: 'Follow a student case from the first warning signs to the results of the support plan.',
+        workflowIntro: 'Select an agent to see its role and findings.',
+        followupIntro: 'Review the changes in scores and attendance and see the updated support plan.',
+        caseLabel: 'Student case', student: 'Adam Khalil', initials: 'AK', grade: 'Eighth grade',
+        risks: { pending: 'Risk assessment pending', high: 'High risk at detection', watch: 'Needs monitoring', low: 'Low risk under detection rules' },
+        detectionResult: (math, attendance, risk) => 'Change in math score: ' + math + ' points. Change in attendance: ' + attendance + ' days. ' + risk + '.',
+        fractionClue: (correct, total) => 'The student answered ' + correct + ' of ' + total + ' fraction questions correctly. The result indicates a need for fraction practice.',
+        learningAssessment: {
+          'no-signal': 'The quiz did not indicate a need for additional fraction practice under the demo rules.',
+          unknown: 'The case has no fraction quiz result.',
+          skipped: 'The detection result did not call for further diagnosis.',
+        },
+        transportAssessment: {
+          'possible-factor': 'Late buses in the transit record coincided with absences. The possible connection needs checking.',
+          'no-signal': 'The transit record did not show a signal that explains the attendance decline.',
+          unknown: 'The case has no transit data.',
+          skipped: '',
+        },
+        math: 'Math score', attendance: 'Weekly attendance',
+        scoreUnit: '/ 100', daysUnit: '/ 5 days', scoreBefore: score => 'Previous score: ' + score,
+        daysBefore: days => 'Previous attendance: ' + days + ' of 5 days',
+        trend: 'Math performance', outOf: 'Out of 100', previous: 'Previous score', detected: 'At detection',
+        latestMeasurement: 'Latest measurement', casePath: 'Case stages', stages: 'Analysis stages',
+        run: 'Run agent analysis', running: 'Analyzing…', replay: 'Run analysis again',
+        openFollowup: 'Open the 8-week plan', openWorkflow: 'Go to agent workflow',
+        openOverview: 'Back to overview', openEvaluation: 'View agent evaluation',
+        plan: 'Updated support plan',
+        queued: 'Queued', active: 'Processing', done: 'Complete', waiting: 'Awaiting follow-up',
+        error: 'Detection failed', detectionError: 'The detection agent could not run. Try running the analysis again.',
+        progress: (count, total) => count + ' of ' + total + ' complete',
+        pending: 'Complete the agent analysis to see the weekly support plan.',
+        inProgress: 'The weekly support plan will be available when the analysis finishes.',
+        ready: 'The analysis is complete. The eight-week support plan is ready.',
+        agents: [
+          ['Detect a decline', 'Compares math scores and attendance across the two weeks and calculates risk using the demo rules.'],
+          ['Diagnose the case', 'Uses the detection result, fraction quiz and transit records to identify what needs follow-up.'],
+          ['Plan an intervention', 'Schedules support sessions based on the diagnosis.'],
+          ['Select resources', 'Suggests practice materials for the support plan.'],
+          ['Evaluate the impact', 'Compares weekly measurements with baseline data and updates the support plan.']
+        ]
+      },
+      uk: {
+        skip: 'Перейти до вмісту', language: 'Мова інтерфейсу', navigation: 'Розділи панелі',
+        demo: 'Демонстраційні дані', overview: 'Огляд', workflow: 'Робота агентів', followup: 'Прогрес',
+        workflowMap: 'Переглянути схему n8n',
+        hostedMode: ['Режим браузера', 'Правила агентів працюють у браузері. Введені показники зберігаються тут.'],
+        loadShared: "Завантажити список із Google Sheets",
+        sharedLoading: "Завантаження списку з Google Sheets…",
+        sharedReady: "Записи з Google Sheets завантажено.",
+        sharedNotConfigured: "Для Google Sheets потрібно налаштувати облікові дані сервера.",
+        sharedUnavailable: "Не вдалося прочитати або зберегти записи Google Sheets.",
+        sharedConflict: "Запис за цей тиждень змінено в Sheets. Оновіть список і відкрийте запис знову.",
+        aiTitle: "Порада від OpenAI",
+        aiNotConfigured: "Для порад OpenAI потрібні налаштування сервера.",
+        aiUnavailable: "Цього разу порада OpenAI недоступна.",
+        aiActions: {
+          'worked-example': "Розберіть разом приклад зі спільним знаменником і дайте схоже завдання.",
+          'explain-steps': "Попросіть учня пояснити додавання двох дробів, щоб визначити складний крок.",
+          'short-skill-check': "Дайте два короткі завдання з останнього уроку, щоб обрати навичку для повторення.",
+          'attendance-log': "Перегляньте дати пропусків і перевірте можливу перешкоду за журналом і розмовою з учнем.",
+          'compare-transit-log': "Зіставте дати пропусків із транспортним журналом і перевірте збіги.",
+        },
+        priorityTitle: "Підтримка за високого рівня ризику",
+        priorityIntro: "Почніть з першої дії та перевірте прогрес під час наступного оцінювання.",
+        priorityActions: {
+          'teacher-check-in': ["Поговоріть протягом двох навчальних днів","З’ясуйте, що завадило навчанню чи відвідуванню, і домовтеся про один конкретний крок."],
+          'fraction-practice': ["Зосередьтеся на дробах","Почніть зі спільного знаменника, далі додайте прості дроби й попросіть учня пояснити кроки."],
+          'math-check': ["Визначте, яка навичка потребує підтримки","Поставте кілька запитань з останнього уроку й виберіть одну навичку для заняття."],
+          'attendance-check': ["Перевірте відвідуваність","Звірте дати пропусків і запишіть підтверджену перешкоду та відповідального за подальші дії."],
+          'transport-check': ["Перевірте запізнення автобуса","Зіставте пропуски з транспортним журналом і перевірте можливий зв’язок."],
+          'weekly-review': ["Перевірте прогрес за тиждень","Використайте тест подібної складності й порівняйте оцінку та відвідуваність. Оновіть план за потреби."],
+        },
+        students: "Учні",
+        studentsIntro: "Додавайте показники учнів і повертайтеся до їхніх щотижневих планів зі списку.",
+        activeStudent: "Поточний учень",
+        addStudent: "Додати учня",
+        rosterTitle: "Список учнів",
+        storageNote: "Ручні записи зберігаються в браузері, а записи Sheets — у таблиці. Використовуйте коди замість повних імен.",
+        studentCode: "Код учня",
+        measurementHelp: "Використовуйте короткі тести з однаковою шкалою та тижневий журнал відвідуваності. Наприклад, 12 із 15 — це 80 зі 100.",
+        baseline: "Початковий показник (перший тиждень)",
+        optionalEvidence: "Додаткові дані для аналізу",
+        quizCorrect: "Правильні відповіді в тесті на дроби",
+        quizTotal: "Усього завдань у тесті на дроби",
+        busDays: "Пропуски, що збіглися із запізненням автобуса",
+        saveStudent: "Зберегти учня й відкрити запис",
+        manualCase: "Показники введено вручну",
+        sampleStudent: "Адам · демонстраційний приклад",
+        noStudents: "Список порожній. Додайте першого учня через форму.",
+        duplicateStudent: "Цей код уже використовується. Виберіть інший.",
+        invalidEvidence: "Введіть обидва показники тесту. Кількість правильних відповідей не може перевищувати загальну, а дні запізнення автобуса — дні пропусків.",
+        storageError: "Не вдалося зберегти запис. Перевірте налаштування сховища браузера й спробуйте ще раз.",
+        storageConflict: "Запис змінено в іншій вкладці. Відкрийте його зі списку учнів і спробуйте ще раз.",
+        manualCheckpoint: "Введіть оцінку за тижневий тест зі 100 і кількість відвіданих днів із 5.",
+        sampleCheckpoint: "Ці демонстраційні показники можна змінити.",
+        comparedWithPrevious: "Зміна від попереднього показника",
+        integrationTitle: 'Результати агентів', liveLink: 'Відкрити панель із підключенням до n8n',
+        openPlan: 'Переглянути план підтримки', openResources: 'Переглянути матеріали',
+        fractionVideo: 'Відео Khan Academy про додавання дробів (англійською)',
+        fractionPractice: 'Додайте дроби', practiceSolution: 'Зведіть дроби до спільного знаменника й додайте чисельники.',
+        reviewChecklist: 'Перегляньте останній тест і виберіть завдання, яке варто виконати повторно.',
+        planSession: (sessions, minutes) => 'Кількість занять на тиждень: ' + sessions + '. Тривалість кожного заняття — ' + minutes + ' хв.',
+        planFocus: {
+          fractions: 'Потренуйтеся зводити дроби до спільного знаменника й додавати їх.',
+          review: 'Розберіть помилки з останнього тесту й визначте, яка навичка потребує підтримки.',
+          monitor: 'Перевірте оцінку з математики й відвідуваність під час наступного оцінювання.',
+          'word-problems': 'На наступних заняттях зосередьтеся на текстових задачах на додавання дробів.',
+          'mixed-review': "Розв’яжіть різні задачі на дроби й попрацюйте над типовими помилками.",
+          independent: "Самостійно розв’яжіть кілька задач і поясніть спосіб розв’язання.",
+        },
+        resourcesText: { fractions: 'Відеопояснення та вправа на дроби з розв’язанням.', review: 'Короткий список для перегляду тесту.', monitor: 'Продовжуйте спостереження за успішністю учня.' },
+        roadmapTitle: "План підтримки на 8 тижнів",
+        weekLabel: week => "Тиждень " + week,
+        reviewWeek: week => "Оцінити тиждень " + week,
+        weekReport: week => "Результати тижня " + week,
+        roadmapProgress: count => "Є результати за " + count + " з 8 тижнів",
+        roadmapStates: { baseline: "Початкові дані", measured: "Є результати", next: "Наступний тиждень", planned: "Заплановано" },
+        roadmapTarget: (math, days) => "Ціль: " + math + " зі 100 і відвідування " + days + " з 5 днів.",
+        roadmapReady: 'Запишіть показники за цей тиждень та оцініть їх, щоб оновити план підтримки.',
+        roadmapComplete: "Оцінювання за всі 8 тижнів завершено.",
+        evaluating: "Триває оцінювання тижня…", evaluationError: "Не вдалося оцінити цей тиждень. Спробуйте ще раз.",
+        evaluationResult: (score, days) => 'Математика: ' + score + ' зі 100. Відвідуваність: ' + days + ' з 5 днів.',
+        sinceDetection: 'Зміна від початкового показника',
+        connection: {
+          ready: ['Режим n8n', 'Запустіть аналіз, щоб переглянути висновки агентів, план підтримки та навчальні матеріали.'],
+          running: ['Очікуємо n8n', 'Панель очікує на результати агентів від n8n.'],
+          verified: ['Результати з n8n', 'Результати агентів готові. Відкрийте план на 8 тижнів, щоб переглянути цілі й записати показники.'],
+          local: ['Локальний перегляд', 'Аналіз виконується в браузері. Відкрийте підключену панель, щоб запустити його через n8n.'],
+          error: ['Аналіз недоступний', 'n8n не повернув дійсного результату. Запустіть аналіз ще раз.'],
+        },
+        heading: 'Панель учителя', overviewIntro: 'Стежте за успішністю учня від перших ознак спаду до оцінки результатів підтримки.',
+        workflowIntro: 'Виберіть агента, щоб переглянути його завдання та висновки.',
+        followupIntro: 'Перегляньте зміни в успішності й відвідуваності та оновлений план підтримки.',
+        caseLabel: 'Профіль учня', student: 'Адам Халіль', initials: 'АХ', grade: '8-й клас',
+        risks: { pending: 'Очікується оцінка ризику', high: 'Високий ризик на момент оцінки', watch: 'Потрібне спостереження', low: 'Низький ризик за правилами оцінювання' },
+        detectionResult: (math, attendance, risk) => 'Зміна оцінки з математики: ' + math + ' (бали). Зміна відвідуваності: ' + attendance + ' (дні). ' + risk + '.',
+        fractionClue: (correct, total) => 'Правильно виконано ' + correct + ' із ' + total + ' завдань на дроби. Результат вказує на потребу попрацювати з дробами.',
+        learningAssessment: {
+          'no-signal': 'За демонстраційними правилами тест не вказав на потребу в додаткових вправах на дроби.',
+          unknown: 'У даних немає результатів тесту на дроби.',
+          skipped: 'Результат оцінювання ризику не потребує додаткового аналізу причин.',
+        },
+        transportAssessment: {
+          'possible-factor': 'За даними журналу запізнення автобуса збігалося з пропусками. Можливий зв’язок потребує перевірки.',
+          'no-signal': 'Дані про транспорт не пояснюють зниження відвідуваності.',
+          unknown: 'У даних учня немає відомостей про транспорт.',
+          skipped: '',
+        },
+        math: 'Оцінка з математики', attendance: 'Відвідуваність за тиждень',
+        scoreUnit: 'зі 100', daysUnit: 'з 5 днів', scoreBefore: score => 'Попередня оцінка: ' + score,
+        daysBefore: days => 'Раніше: ' + days + ' з 5 днів',
+        trend: 'Успішність із математики', outOf: 'Зі 100 балів', previous: 'Попередня оцінка', detected: 'На момент виявлення',
+        latestMeasurement: 'Останній показник', casePath: 'Етапи роботи з учнем', stages: 'Етапи аналізу',
+        run: 'Запустити аналіз агентів', running: 'Триває аналіз…', replay: 'Запустити аналіз знову',
+        openFollowup: 'Відкрити план на 8 тижнів', openWorkflow: 'Перейти до роботи агентів',
+        openOverview: 'Повернутися до огляду', openEvaluation: 'Переглянути оцінку агента',
+        plan: 'Оновлений план підтримки',
+        queued: 'Очікує запуску', active: 'Виконується', done: 'Завершено', waiting: 'Очікує результатів',
+        error: 'Помилка оцінювання', detectionError: 'Не вдалося запустити агента оцінювання. Спробуйте ще раз.',
+        progress: (count, total) => 'Завершено ' + count + ' з ' + total,
+        pending: 'Завершіть аналіз агентів, щоб переглянути щотижневий план підтримки.',
+        inProgress: 'Щотижневий план підтримки з’явиться після завершення аналізу.',
+        ready: 'Аналіз завершено. План підтримки на 8 тижнів готовий.',
+        agents: [
+          ['Виявлення спаду', 'Порівнює оцінки з математики й відвідуваність за два тижні та визначає рівень ризику за демонстраційними правилами.'],
+          ['Аналіз причин', 'Використовує оцінку ризику, тест на дроби й записи про транспорт, щоб визначити, що потребує уваги.'],
+          ['Планування підтримки', 'Складає розклад занять з урахуванням висновків аналізу.'],
+          ['Добір матеріалів', 'Пропонує навчальні матеріали для виконання плану підтримки.'],
+          ['Оцінювання результатів', 'Порівнює щотижневі показники з початковими й оновлює план підтримки.']
+        ]
+      }
+    };
+
+    const demoStudent = {
+      code: '',
+      observations: {
+        previous: { mathScore: 82, attendedDays: 5 },
+        current: { mathScore: 54, attendedDays: 3 },
+        evidence: { fractionQuiz: { correct: 2, total: 6 }, lateBusOnAbsenceDays: 2 },
+      },
+      checkpoints: [],
+    };
+    const hosted = document.querySelector('meta[name="edumind-mode"]')?.content === 'browser';
+    const standalone = hosted || location.protocol === 'file:';
+    const sampleWeeks = [[70, 5], [72, 5], [68, 4], [75, 5], [78, 5], [82, 5], [85, 5]];
+    const studentPrefix = 'edumind-student:';
+    const validStudentCode = /^[A-Z0-9_-]{3,24}$/;
+
+    function getStudents() {
+      try {
+        return Object.keys(localStorage).filter(key => key.startsWith(studentPrefix)).flatMap(key => {
+          try {
+            const record = JSON.parse(localStorage.getItem(key));
+            if (!validStudentCode.test(record.code) || key !== studentPrefix + record.code) return [];
+            const observations = readObservations(record.observations);
+            observations.evidence = readDiagnosisEvidence(record.observations.evidence, observations.current.attendedDays);
+            const checkpoints = readCheckpoints(record, observations.current, readObservations);
+            return [{ code: record.code, observations, checkpoints }];
+          } catch {
+            return [];
+          }
+        }).sort((a, b) => a.code.localeCompare(b.code));
+      } catch {
+        return [];
+      }
+    }
+
+    let roster = getStudents();
+    let sharedRoster = [];
+    let sharedState = '';
+    const selectorValue = student => student.source === 'sheets' ? 'sheet:' + student.code : student.code;
+    let activeStudent = demoStudent;
+    let preferredStudent = '';
+    try {
+      preferredStudent = sessionStorage.getItem('edumind-active-student') ?? '';
+      activeStudent = roster.find(record => record.code === preferredStudent) ?? demoStudent;
+    } catch {
+      // Selection still works for the current page.
+    }
+    let observations = activeStudent.observations;
+
+    async function requestAnalysis(measurements = []) {
+      if (standalone) {
+        const result = detectRisk(observations);
+        const evidence = readDiagnosisEvidence(observations.evidence, observations.current.attendedDays);
+        const diagnosis = diagnoseCase(result, evidence);
+        const plan = planIntervention(diagnosis);
+        const { weeks: roadmap, evaluation } = buildRoadmap(plan, observations.current, measurements);
+        const analysis = { ...result, diagnosis, plan, resources: chooseResources(plan), roadmap, support: prioritizeSupport(result, diagnosis) };
+        if (evaluation) analysis.evaluation = evaluation;
+        return analysis;
+      }
+      const response = await fetch('/api/detection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(measurements.length ? { ...observations, checkpoints: measurements } : observations),
+        signal: AbortSignal.timeout(15000),
+      });
+      if (!response.ok) throw new Error('Detection unavailable');
+      return response.json();
+    }
+
+    const icons = ['↘', '◎', '≡', '▤', '◷'];
+    const lastAgent = icons.length - 1;
+    const $ = selector => document.querySelector(selector);
+    const all = selector => [...document.querySelectorAll(selector)];
+    const heading = $('#heading');
+    const languagePicker = $('#language');
+    const studentPicker = $('#student-picker');
+    const studentForm = $('#student-form');
+    const sharedButton = $('#load-shared');
+    const staticCopy = all('[data-copy]');
+    const labels = all('[data-label]');
+    const navigation = all('[data-route]');
+    const screens = all('.screen');
+    const runButtons = all('[data-action="run"]');
+    const followButtons = all('[data-action="follow"]');
+    const checkpointForm = $('#checkpoint-form');
+    const scoreInput = $('#checkpoint-score');
+    const attendanceInput = $('#checkpoint-attendance');
+    const reviewButton = $('#review');
+    const chartPoints = all('.chart-point');
+    const riskBadge = $('#risk');
+    const detail = $('#agent-detail');
+    const announcement = $('#announcement');
+    const resourceItems = all('[data-resource]');
+    const narrowLayout = matchMedia('(max-width: 800px)');
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+    const agents = icons.map((icon, index) => {
+      const stage = document.createElement('li');
+      stage.className = 'agent';
+      stage.innerHTML = '<button class="agent-button" type="button" aria-controls="agent-detail"><span class="node-icon" aria-hidden="true"></span><span class="agent-title"></span><span class="status"></span></button>';
+      $('#agents').append(stage);
+      const button = stage.firstElementChild;
+      button.addEventListener('click', () => {
+        selectedAgent = index;
+        render();
+        if (narrowLayout.matches) $('#agent-heading').focus();
+      });
+
+      const pathStage = document.createElement('li');
+      pathStage.innerHTML = '<a class="path-link"><span class="node-icon" aria-hidden="true"></span><span class="agent-title"></span><span class="sr-only"></span></a>';
+      pathStage.firstElementChild.href = '#workflow/' + (index + 1);
+      $('#path').append(pathStage);
+      return { stage, button, pathStage, icon };
+    });
+
+    let language = 'ar';
+    try {
+      const saved = localStorage.getItem('edumind-language');
+      if (Object.hasOwn(copy, saved)) language = saved;
+    } catch {
+      // The language picker still works when local storage is unavailable.
+    }
+
+    let screen = 'overview';
+    let completed = 0;
+    let running = false;
+    let selectedAgent = null;
+    let selectedPoint = 1;
+    let detection = null;
+    let detectionFailed = false;
+    let evaluating = false;
+    let evaluation = null;
+    let evaluationFailed = false;
+    let evaluationFailure = 'evaluationError';
+    let checkpoints = [...activeStudent.checkpoints];
+    let formFailure = '';
+
+    function loadSampleWeek() {
+      const sample = activeStudent.code ? null : sampleWeeks[checkpoints.length];
+      scoreInput.value = sample?.[0] ?? '';
+      attendanceInput.value = sample?.[1] ?? '';
+    }
+
+    function renderStudents(t) {
+      const busy = running || evaluating;
+      const students = [...roster, ...sharedRoster];
+      const choices = [demoStudent, ...students].map(student => new Option(
+        student.source === 'sheets' ? student.code + ' · Google Sheets' : student.code || t.sampleStudent,
+        selectorValue(student),
+      ));
+      studentPicker.replaceChildren(...choices);
+      studentPicker.value = selectorValue(activeStudent);
+      studentPicker.disabled = busy;
+      $('#student-switch').hidden = screen === 'students';
+      $('#save-student').disabled = busy;
+      sharedButton.disabled = busy || sharedState === 'sharedLoading';
+      const status = $('#shared-status');
+      if (status.textContent !== (t[sharedState] ?? '')) status.textContent = t[sharedState] ?? '';
+      const failure = $('#student-form-error');
+      failure.hidden = !formFailure;
+      failure.textContent = t[formFailure] ?? '';
+      const entries = students.length ? students.map(student => {
+        const item = document.createElement('li');
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.studentCode = selectorValue(student);
+        button.disabled = busy;
+        const code = document.createElement('bdi');
+        code.textContent = student.code;
+        const progress = document.createElement('small');
+        progress.textContent = (student.source === 'sheets' ? 'Google Sheets · ' : '') +
+          t.roadmapProgress(student.checkpoints.length + 1);
+        button.append(code, progress);
+        item.append(button);
+        return item;
+      }) : [Object.assign(document.createElement('li'), { textContent: t.noStudents, className: 'form-hint' })];
+      $('#student-list').replaceChildren(...entries);
+      const source = activeStudent.source === 'sheets' ? 'Google Sheets' : t.manualCase;
+      $('#case-source').textContent = activeStudent.code ? source : t.demo;
+      $('#student').textContent = activeStudent.code || t.student;
+      $('#student-initials').textContent = activeStudent.code.slice(0, 2) || t.initials;
+      $('#student-description').textContent = activeStudent.code ? source : t.grade;
+      $('#checkpoint-source').textContent = activeStudent.code ? t.manualCheckpoint : t.sampleCheckpoint;
+    }
+
+    function renderRoadmap(translation) {
+      const list = $('#roadmap');
+      $('#roadmap-panel').hidden = !detection;
+      if (!detection) {
+        list.replaceChildren();
+        return;
+      }
+
+      $('#roadmap-progress').textContent = translation.roadmapProgress(checkpoints.length + 1);
+      list.replaceChildren(...detection.roadmap.map(row => {
+        const item = document.createElement('li');
+        const state = row.week === 1 ? 'baseline' : row.measurement ? 'measured'
+          : row.week === checkpoints.length + 2 ? 'next' : 'planned';
+        item.dataset.weekState = state;
+        const header = document.createElement('div');
+        header.className = 'section-head';
+        const title = document.createElement('h3');
+        title.textContent = translation.weekLabel(row.week);
+        const status = document.createElement('span');
+        status.className = 'status';
+        status.textContent = translation.roadmapStates[state];
+        header.append(title, status);
+        item.append(header);
+        const details = [
+          translation.planFocus[row.focus],
+          row.sessions ? translation.planSession(row.sessions, row.minutes) : '',
+          translation.roadmapTarget(row.mathTarget, row.attendanceTarget),
+          row.measurement ? translation.evaluationResult(row.measurement.mathScore, row.measurement.attendedDays) : '',
+        ];
+        details.filter(Boolean).forEach(text => {
+          const paragraph = document.createElement('p');
+          paragraph.textContent = text;
+          item.append(paragraph);
+        });
+        return item;
+      }));
+    }
+
+    function render() {
+      const t = copy[language];
+      const ready = completed === lastAgent;
+      const allMeasured = Boolean(evaluation) && checkpoints.length === sampleWeeks.length;
+      const nextWeek = checkpoints.length + 2;
+      const lastWeek = checkpoints.length + 1;
+      const total = completed + Number(allMeasured);
+      const activeAgent = selectedAgent ?? completed;
+      const screenTitle = screen === 'overview' ? t.heading : t[screen];
+      const mode = standalone ? 'local' : detection ? 'verified' : detectionFailed ? 'error' : running ? 'running' : 'ready';
+      const [connectionLabel, connectionNote] = hosted ? t.hostedMode : t.connection[mode];
+      const signed = new Intl.NumberFormat(language, { signDisplay: 'exceptZero' });
+      const connection = $('#connection');
+      connection.dataset.mode = mode;
+      if (connection.textContent !== connectionLabel) connection.textContent = connectionLabel;
+      $('#connection-note').textContent = connectionNote;
+      $('#integration').hidden = screen === 'followup' || screen === 'students';
+      $('#live-link').hidden = !standalone || hosted;
+      renderStudents(t);
+      $('#priority-support').hidden = screen === 'students' || !detection?.support?.length;
+      $('#priority-actions').replaceChildren(...(detection?.support ?? []).map(action => {
+        const item = document.createElement('li');
+        const title = document.createElement('strong');
+        const guidance = document.createElement('p');
+        [title.textContent, guidance.textContent] = t.priorityActions[action];
+        item.append(title, guidance);
+        return item;
+      }));
+
+      const summaries = [t.agents[0][1], t.agents[1][1]];
+      if (detection) {
+        summaries[0] = t.detectionResult(
+          signed.format(detection.mathChange),
+          signed.format(detection.attendanceChange),
+          t.risks[detection.risk],
+        );
+        const { learning, transport } = detection.diagnosis;
+        const quiz = observations.evidence.fractionQuiz;
+        const learningText = learning === 'fractions' && quiz ? t.fractionClue(quiz.correct, quiz.total) : t.learningAssessment[learning];
+        summaries[1] = [learningText, t.transportAssessment[transport]].filter(Boolean).join(' ');
+        const { focus, sessions, minutes } = detection.plan;
+        summaries[2] = [sessions ? t.planSession(sessions, minutes) : '', t.planFocus[focus]].filter(Boolean).join(' ');
+        summaries[3] = t.resourcesText[focus];
+      }
+      $('#summary-detection-title').textContent = t.agents[0][0];
+      $('#summary-detection').textContent = detectionFailed ? t.detectionError : summaries[0];
+      $('#summary-diagnosis-title').textContent = t.agents[1][0];
+      $('#summary-diagnosis').textContent = summaries[1];
+      $('#plan-preview').hidden = completed < 3;
+      $('#resources-preview').hidden = !ready;
+      $('#summary-plan-title').textContent = t.agents[2][0];
+      $('#summary-plan').textContent = summaries[2] ?? '';
+      $('#summary-resources-title').textContent = t.agents[3][0];
+      $('#summary-resources').textContent = summaries[3] ?? '';
+      renderRoadmap(t);
+      $('#follow-caption').textContent = evaluation ? t.weekLabel(lastWeek) : t.latestMeasurement;
+      if (evaluation) {
+        summaries[4] = t.evaluationResult(evaluation.mathScore, evaluation.attendedDays) + ' ' + t.planFocus[evaluation.focus];
+        $('#evaluation-source').textContent = t.connection[standalone ? 'local' : 'verified'][0];
+        $('#comparison').textContent = t.weekReport(lastWeek);
+        $('#math-comparison').textContent = observations.current.mathScore + ' → ' + evaluation.mathScore;
+        $('#attendance-comparison').textContent = observations.current.attendedDays + ' → ' + evaluation.attendedDays;
+        $('#math-delta').textContent = t.sinceDetection + ' ' + signed.format(evaluation.mathChange);
+        $('#attendance-delta').textContent = t.sinceDetection + ' ' + signed.format(evaluation.attendanceChange);
+        $('#updated-plan').textContent = t.planFocus[evaluation.focus];
+        $('#followBar').textContent = evaluation.mathScore;
+        $('#followBar').style.setProperty('--score', evaluation.mathScore);
+      }
+
+      document.title = 'EduMind AI · ' + screenTitle;
+      heading.textContent = screenTitle;
+      $('#introduction').textContent = t[screen + 'Intro'];
+      screens.forEach(panel => { panel.hidden = panel.id !== 'screen-' + screen; });
+      navigation.forEach(link => {
+        if (link.dataset.route === screen) link.setAttribute('aria-current', 'page');
+        else link.removeAttribute('aria-current');
+      });
+
+      runButtons.forEach(button => {
+        button.setAttribute('aria-disabled', String(running || evaluating));
+        button.firstElementChild.textContent = evaluating ? t.evaluating : running ? t.running : ready ? t.replay : t.run;
+      });
+      followButtons.forEach(button => {
+        button.disabled = !ready;
+        button.firstElementChild.textContent = t.openFollowup;
+      });
+      $('#progress').textContent = $('#overviewProgress').textContent = t.progress(total, icons.length);
+      riskBadge.dataset.level = detection?.risk ?? 'pending';
+      riskBadge.textContent = t.risks[riskBadge.dataset.level];
+      $('#score').textContent = evaluation?.mathScore ?? observations.current.mathScore;
+      $('#days').textContent = evaluation?.attendedDays ?? observations.current.attendedDays;
+      $('#scoreChange').textContent = evaluation ? t.sinceDetection + ' ' + signed.format(evaluation.mathChange) : t.scoreBefore(observations.previous.mathScore);
+      $('#daysChange').textContent = evaluation ? t.sinceDetection + ' ' + signed.format(evaluation.attendanceChange) : t.daysBefore(observations.previous.attendedDays);
+      $('#report').hidden = $('#followBar').hidden = !evaluation;
+      $('.bar-pending').hidden = Boolean(evaluation);
+      checkpointForm.hidden = !ready || allMeasured;
+      $('#backToWorkflow').hidden = ready;
+      reviewButton.disabled = evaluating;
+      scoreInput.disabled = attendanceInput.disabled = evaluating;
+      reviewButton.firstElementChild.textContent = evaluating ? t.evaluating : t.reviewWeek(nextWeek);
+      $('#toFollowup').hidden = !ready;
+      $('#pendingTitle').textContent = allMeasured ? t.roadmapTitle : t.weekLabel(nextWeek);
+      $('#pendingText').textContent = evaluationFailed ? t[evaluationFailure] : evaluating ? t.evaluating
+        : allMeasured ? t.roadmapComplete : ready ? t.roadmapReady : running ? t.inProgress : t.pending;
+
+      chartPoints[2].disabled = !evaluation;
+      chartPoints.forEach((point, index) => {
+        point.setAttribute('aria-pressed', String(index === selectedPoint));
+      });
+      const previousScore = observations.previous.mathScore;
+      const baselineScore = observations.current.mathScore;
+      const previousBar = $('#previous-bar');
+      const baselineBar = $('#baseline-bar');
+      previousBar.textContent = previousScore;
+      baselineBar.textContent = baselineScore;
+      previousBar.style.setProperty('--score', previousScore);
+      baselineBar.style.setProperty('--score', baselineScore);
+      const chartText = [
+        t.previous + ' · ' + previousScore + ' ' + t.scoreUnit,
+        t.detected + ' · ' + baselineScore + ' ' + t.scoreUnit + ' · ' + t.comparedWithPrevious + ' ' + signed.format(baselineScore - previousScore),
+        evaluation ? t.weekLabel(lastWeek) + ' · ' + evaluation.mathScore + ' · ' + t.sinceDetection + ' ' + signed.format(evaluation.mathChange) : '',
+      ][selectedPoint];
+      if ($('#chartDetail').textContent !== chartText) $('#chartDetail').textContent = chartText;
+
+      agents.forEach(({ stage, button, pathStage, icon }, index) => {
+        let state = 'queued';
+        if (index < total) state = 'done';
+        else if (index === 0 && detectionFailed) state = 'error';
+        else if (index === lastAgent && evaluationFailed) state = 'error';
+        else if (index === lastAgent && evaluating) state = 'active';
+        else if (index === completed && running) state = 'active';
+        else if (index === completed && ready) state = 'waiting';
+
+        stage.dataset.state = pathStage.dataset.state = state;
+        const title = t.agents[index][0];
+        const mark = state === 'done' ? '✓' : icon;
+        button.setAttribute('aria-pressed', String(index === activeAgent));
+        button.children[0].textContent = pathStage.querySelector('.node-icon').textContent = mark;
+        button.children[1].textContent = pathStage.querySelector('.agent-title').textContent = title;
+        button.children[2].textContent = t[state];
+        pathStage.querySelector('.sr-only').textContent = ' · ' + t[state];
+      });
+
+      const state = agents[activeAgent].stage.dataset.state;
+      const [title, role] = t.agents[activeAgent];
+      detail.dataset.state = state;
+      $('#agentStatus').textContent = t[state];
+      $('#agent-heading').textContent = title;
+      $('#agentResult').textContent = state === 'error' ? (activeAgent === lastAgent ? t[evaluationFailure] : t.detectionError)
+        : state === 'done' || (activeAgent === lastAgent && evaluation && !evaluating) ? summaries[activeAgent] : role;
+      const ai = activeAgent === 1 && state === 'done' ? detection.aiAdvice : null;
+      const advice = $('#ai-advice');
+      advice.hidden = !ai || ai.status === 'skipped';
+      advice.textContent = ai?.status === 'ready' ? t.aiTitle + ' · ' + t.aiActions[ai.action]
+        : ai?.status === 'not-configured' ? t.aiNotConfigured : ai?.status === 'unavailable' ? t.aiUnavailable : '';
+      const resources = activeAgent === 3 && state === 'done' ? detection.resources : [];
+      $('#agent-resources').hidden = resources.length === 0;
+      resourceItems.forEach(item => { item.hidden = !resources.includes(item.dataset.resource); });
+
+      const message = detectionFailed ? t.detectionError : evaluationFailed ? t[evaluationFailure] : evaluating ? t.evaluating
+        : evaluation ? summaries[4] : running ? t.agents[completed][0] + ' · ' + t.active : ready ? t.ready : '';
+      if (announcement.textContent !== message) announcement.textContent = message;
+    }
+
+    function applyLanguage() {
+      const t = copy[language];
+      document.documentElement.lang = language;
+      document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+      languagePicker.value = language;
+      staticCopy.forEach(element => { element.textContent = t[element.dataset.copy]; });
+      labels.forEach(element => element.setAttribute('aria-label', t[element.dataset.label]));
+      render();
+    }
+
+    function readRoute(moveFocus) {
+      const agentRoute = /^#workflow\/([1-5])$/.exec(location.hash);
+      if (agentRoute) {
+        screen = 'workflow';
+        selectedAgent = Number(agentRoute[1]) - 1;
+      } else {
+        const route = location.hash.slice(1);
+        screen = ['students', 'followup', 'workflow'].includes(route) ? route : 'overview';
+      }
+      render();
+      if (moveFocus) {
+        if (agentRoute) {
+          $('#agent-heading').focus();
+        } else {
+          heading.focus({ preventScroll: true });
+          window.scrollTo(0, 0);
+        }
+      }
+    }
+
+    languagePicker.addEventListener('change', () => {
+      language = languagePicker.value;
+      try {
+        localStorage.setItem('edumind-language', language);
+      } catch {
+        // The current tab keeps the chosen language.
+      }
+      applyLanguage();
+    });
+    window.addEventListener('hashchange', () => readRoute(true));
+    $('#skip').addEventListener('click', event => {
+      event.preventDefault();
+      heading.focus();
+    });
+
+    chartPoints.forEach((point, index) => {
+      point.addEventListener('click', () => {
+        selectedPoint = index;
+        render();
+      });
+    });
+
+    function activateStudent(student, openOverview = true) {
+      if (!student || running || evaluating) return;
+      activeStudent = student;
+      observations = student.observations;
+      checkpoints = [...student.checkpoints];
+      completed = 0;
+      detection = evaluation = null;
+      detectionFailed = evaluationFailed = false;
+      formFailure = '';
+      selectedAgent = null;
+      selectedPoint = 1;
+      loadSampleWeek();
+      try {
+        sessionStorage.setItem('edumind-active-student', selectorValue(student));
+      } catch {
+        // Selection can still be used while this page is open.
+      }
+      if (openOverview && location.hash !== '#overview') location.hash = 'overview';
+      render();
+      if (checkpoints.length) void runAnalysis(true);
+    }
+
+    function findStudent(value) {
+      if (!value) return demoStudent;
+      return [...getStudents(), ...sharedRoster].find(record => selectorValue(record) === value);
+    }
+
+    async function loadSharedRoster(restoreCode) {
+      if (running || evaluating || sharedState === 'sharedLoading') return;
+      sharedState = standalone ? 'sharedNotConfigured' : 'sharedLoading';
+      renderStudents(copy[language]);
+      if (standalone) return;
+      try {
+        const response = await fetch('/api/shared-students', { signal: AbortSignal.timeout(19000) });
+        if (!response.ok) throw new Error('Shared roster unavailable');
+        const { configured, students } = await response.json();
+        sharedRoster = students.map(student => ({ ...student, source: 'sheets' }));
+        sharedState = configured ? 'sharedReady' : 'sharedNotConfigured';
+        if (restoreCode) activateStudent(findStudent(restoreCode), false);
+      } catch {
+        sharedState = 'sharedUnavailable';
+      }
+      renderStudents(copy[language]);
+    }
+
+    sharedButton.addEventListener('click', () => { void loadSharedRoster(); });
+    studentPicker.addEventListener('change', () => activateStudent(findStudent(studentPicker.value)));
+    $('#student-list').addEventListener('click', event => {
+      const row = event.target.closest('button[data-student-code]');
+      if (row) activateStudent(findStudent(row.dataset.studentCode));
+    });
+    window.addEventListener('storage', event => {
+      if (event.key !== null && !event.key.startsWith(studentPrefix)) return;
+      roster = getStudents();
+      renderStudents(copy[language]);
+    });
+
+    studentForm.addEventListener('submit', event => {
+      event.preventDefault();
+      if (running || evaluating) return;
+      const code = $('#new-code').value.trim().toUpperCase();
+      if (!validStudentCode.test(code)) return;
+      const input = readObservations({
+        previous: { mathScore: $('#new-previous-score').valueAsNumber, attendedDays: $('#new-previous-days').valueAsNumber },
+        current: { mathScore: $('#new-current-score').valueAsNumber, attendedDays: $('#new-current-days').valueAsNumber },
+      });
+      const correct = $('#new-quiz-correct');
+      const total = $('#new-quiz-total');
+      const bus = $('#new-bus');
+      try {
+        input.evidence = readDiagnosisEvidence({
+          fractionQuiz: correct.value !== '' || total.value !== '' ? { correct: correct.valueAsNumber, total: total.valueAsNumber } : null,
+          lateBusOnAbsenceDays: bus.value === '' ? null : bus.valueAsNumber,
+        }, input.current.attendedDays);
+      } catch {
+        formFailure = 'invalidEvidence';
+        renderStudents(copy[language]);
+        return;
+      }
+      const student = { code, observations: input, checkpoints: [] };
+      try {
+        const key = studentPrefix + code;
+        if (localStorage.getItem(key) !== null) {
+          formFailure = 'duplicateStudent';
+          renderStudents(copy[language]);
+          return;
+        }
+        localStorage.setItem(key, JSON.stringify(student));
+      } catch {
+        formFailure = 'storageError';
+        renderStudents(copy[language]);
+        return;
+      }
+      roster = getStudents();
+      studentForm.reset();
+      activateStudent(student);
+    });
+
+    async function runAnalysis(restore = false) {
+      if (running || evaluating) return;
+      completed = 0;
+      detection = null;
+      detectionFailed = false;
+      evaluation = null;
+      evaluationFailed = false;
+      checkpoints = [...activeStudent.checkpoints];
+      loadSampleWeek();
+      running = true;
+      selectedAgent = null;
+      selectedPoint = 1;
+      if (!restore && location.hash !== '#workflow') location.hash = 'workflow';
+      render();
+
+      const delay = restore ? 0 : reducedMotion.matches ? 120 : 650;
+      while (completed < lastAgent) {
+        await new Promise(resolve => setTimeout(resolve, delay));
+        if (completed === 0) {
+          try {
+            detection = await requestAnalysis(checkpoints);
+            evaluation = detection.evaluation ?? null;
+            selectedPoint = evaluation ? 2 : 1;
+            if (restore) completed = lastAgent - 1;
+          } catch {
+            detectionFailed = true;
+            running = false;
+            render();
+            return;
+          }
+        }
+        completed += 1;
+        if (completed === lastAgent) running = false;
+        render();
+      }
+    }
+
+    async function recordCheckpoint(event) {
+      event.preventDefault();
+      if (running || evaluating || completed !== lastAgent || checkpoints.length >= sampleWeeks.length) return;
+      const next = [...checkpoints, { mathScore: scoreInput.valueAsNumber, attendedDays: attendanceInput.valueAsNumber }];
+      evaluating = true;
+      evaluationFailed = false;
+      evaluationFailure = 'evaluationError';
+      render();
+      try {
+        let result;
+        if (activeStudent.source === 'sheets') {
+          const response = await fetch('/api/shared-checkpoint', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            signal: AbortSignal.timeout(45000),
+            body: JSON.stringify({ code: activeStudent.code, week: next.length + 1, measurement: next.at(-1) }),
+          });
+          if (!response.ok) {
+            evaluationFailure = response.status === 409 ? 'sharedConflict' : 'sharedUnavailable';
+            throw new Error('Shared update failed');
+          }
+          const payload = await response.json();
+          result = payload.analysis;
+          activeStudent = { ...payload.student, source: 'sheets' };
+          observations = activeStudent.observations;
+          sharedRoster = sharedRoster.map(student => student.code === activeStudent.code ? activeStudent : student);
+        } else {
+          result = await requestAnalysis(next);
+        }
+        if (activeStudent.code && activeStudent.source !== 'sheets') {
+          const key = studentPrefix + activeStudent.code;
+          try {
+            if (localStorage.getItem(key) !== JSON.stringify(activeStudent)) {
+              evaluationFailure = 'storageConflict';
+              throw new Error('Record changed');
+            }
+            const updated = { ...activeStudent, checkpoints: next };
+            localStorage.setItem(key, JSON.stringify(updated));
+            activeStudent = updated;
+            roster = getStudents();
+          } catch (error) {
+            if (evaluationFailure !== 'storageConflict') evaluationFailure = 'storageError';
+            throw error;
+          }
+        }
+        if (detection?.aiAdvice) result.aiAdvice = detection.aiAdvice;
+        evaluation = result.evaluation;
+        detection = result;
+        checkpoints = activeStudent.source === 'sheets' ? [...activeStudent.checkpoints] : next;
+        loadSampleWeek();
+        selectedPoint = 2;
+      } catch {
+        evaluationFailed = true;
+      } finally {
+        evaluating = false;
+        render();
+      }
+      if (screen === 'followup') (evaluationFailed ? reviewButton : $('#comparison')).focus();
+    }
+
+    runButtons.forEach(button => button.addEventListener('click', () => runAnalysis()));
+    followButtons.forEach(button => button.addEventListener('click', () => { location.hash = 'followup'; }));
+    checkpointForm.addEventListener('submit', recordCheckpoint);
+    readRoute(false);
+    applyLanguage();
+    if (checkpoints.length) void runAnalysis(true);
+    if (preferredStudent.startsWith('sheet:')) void loadSharedRoster(preferredStudent);
+  </script>
+</body>
+</html>

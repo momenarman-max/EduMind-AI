@@ -1,0 +1,180 @@
+{
+  "name": "EduMind AI | Student support",
+  "active": false,
+  "nodes": [
+    {
+      "id": "4eca59cb-3004-4312-9bdb-a057d5566287",
+      "name": "Receive observations",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "9afa4de3-cf3e-4abc-851f-282cb9eada60",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "edumind/detection",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      }
+    },
+    {
+      "id": "71a0f0ae-2530-4648-9935-1bfabf88ea5d",
+      "name": "Detect risk",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        250,
+        0
+      ],
+      "parameters": {
+        "jsCode": "function readObservations(input) {\n  const { previous, current } = input ?? {};\n  const validPeriod = period => (\n    period && Number.isInteger(period.mathScore) && period.mathScore >= 0 && period.mathScore <= 100\n    && Number.isInteger(period.attendedDays) && period.attendedDays >= 0 && period.attendedDays <= 5\n  );\n\n  if (!validPeriod(previous) || !validPeriod(current)) {\n    throw new RangeError('Each period requires a whole math score from 0 to 100 and attendance from 0 to 5 days.');\n  }\n\n  const period = ({ mathScore, attendedDays }) => ({ mathScore, attendedDays });\n  return { previous: period(previous), current: period(current) };\n}\n\nfunction detectRisk(input) {\n  const { previous, current } = readObservations(input);\n  const mathChange = current.mathScore - previous.mathScore;\n  const attendanceChange = current.attendedDays - previous.attendedDays;\n  const mathWarning = mathChange <= -15;\n  const attendanceWarning = attendanceChange <= -2;\n  const risk = mathWarning && attendanceWarning ? 'high' : mathWarning || attendanceWarning ? 'watch' : 'low';\n\n  return { risk, mathChange, attendanceChange };\n}\n\nfunction readDiagnosisEvidence(input, attendedDays) {\n  if (input != null && (typeof input !== 'object' || Array.isArray(input))) {\n    throw new RangeError('Evidence must be a JSON object.');\n  }\n\n  const { fractionQuiz = null, lateBusOnAbsenceDays = null } = input ?? {};\n  let quiz = null;\n  if (fractionQuiz !== null) {\n    const { correct, total } = fractionQuiz;\n    if (!Number.isInteger(total) || total < 1 || total > 100 ||\n      !Number.isInteger(correct) || correct < 0 || correct > total) {\n      throw new RangeError('Fraction quiz requires a total from 1 to 100 and a correct count from 0 to the total.');\n    }\n    quiz = { correct, total };\n  }\n\n  if (lateBusOnAbsenceDays !== null && (!Number.isInteger(lateBusOnAbsenceDays) ||\n    lateBusOnAbsenceDays < 0 || lateBusOnAbsenceDays > 5 - attendedDays)) {\n    throw new RangeError('Bus delay days must be within the current absence count.');\n  }\n\n  return { fractionQuiz: quiz, lateBusOnAbsenceDays };\n}\nfunction readCheckpoints(input, current, normalize) {\n  const checkpoints = input.checkpoints ?? (input.weekTwo == null ? [] : [input.weekTwo]);\n  if (!Array.isArray(checkpoints) || checkpoints.length > 7) {\n    throw new RangeError('Provide at most seven weekly measurements, in order from week two.');\n  }\n  return checkpoints.map(week => normalize({ previous: current, current: week }).current);\n}\n\nconst input = $input.first().json.body;\ntry {\n  const body = detectRisk(input);\n  const evidence = readDiagnosisEvidence(input.evidence, input.current.attendedDays);\n  const current = readObservations(input).current;\n  const checkpoints = readCheckpoints(input, current, readObservations);\n  return [{ json: { statusCode: 200, body, evidence, current, checkpoints } }];\n} catch (error) {\n  if (!(error instanceof RangeError)) throw error;\n  return [{ json: { statusCode: 422, body: { error: \"INVALID_OBSERVATIONS\", message: error.message } } }];\n}"
+      }
+    },
+    {
+      "id": "8c5ded52-d2b3-4705-bdfd-c430f81f477b",
+      "name": "Diagnose case",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        0
+      ],
+      "parameters": {
+        "jsCode": "function diagnoseCase(detection, evidence) {\n  if (detection.risk === 'low') return { learning: 'skipped', transport: 'skipped' };\n\n  const quiz = evidence.fractionQuiz;\n  let learning = 'unknown';\n  if (quiz) learning = quiz.correct * 5 < quiz.total * 3 ? 'fractions' : 'no-signal';\n\n  const bus = evidence.lateBusOnAbsenceDays;\n  let transport = 'unknown';\n  if (bus !== null) transport = detection.attendanceChange < 0 && bus > 0 ? 'possible-factor' : 'no-signal';\n\n  return { learning, transport };\n}\n\nconst data = $input.first().json;\nif (data.statusCode === 200) data.body.diagnosis = diagnoseCase(data.body, data.evidence);\nreturn [{ json: data }];"
+      }
+    },
+    {
+      "id": "345f4f2f-cec1-4936-8fe2-b2ebfca77fea",
+      "name": "Plan intervention",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        750,
+        0
+      ],
+      "parameters": {
+        "jsCode": "function planIntervention(diagnosis) {\n  if (diagnosis.learning === 'skipped') return { focus: 'monitor', sessions: 0, minutes: 0 };\n  if (diagnosis.learning === 'fractions') return { focus: 'fractions', sessions: 3, minutes: 20 };\n  return { focus: 'review', sessions: 1, minutes: 15 };\n}\nfunction prioritizeSupport(detection, diagnosis) {\n  if (detection.risk !== 'high') return [];\n  const priorities = ['teacher-check-in'];\n  priorities.push(diagnosis.learning === 'fractions' ? 'fraction-practice' : 'math-check');\n  if (detection.attendanceChange < 0) priorities.push('attendance-check');\n  if (diagnosis.transport === 'possible-factor') priorities.push('transport-check');\n  priorities.push('weekly-review');\n  return priorities;\n}\nconst data = $input.first().json;\nif (data.statusCode === 200) {\n  data.body.plan = planIntervention(data.body.diagnosis);\n  data.body.support = prioritizeSupport(data.body, data.body.diagnosis);\n}\nreturn [{ json: data }];"
+      }
+    },
+    {
+      "id": "821591bd-4279-42da-b735-4b88cda44928",
+      "name": "Choose resources",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        0
+      ],
+      "parameters": {
+        "jsCode": "function chooseResources(plan) {\n  return plan.focus === 'fractions' ? ['fraction-video', 'fraction-practice']\n    : plan.focus === 'review' ? ['review-checklist'] : [];\n}\nconst data = $input.first().json;\nif (data.statusCode === 200) data.body.resources = chooseResources(data.body.plan);\nreturn [{ json: data }];"
+      }
+    },
+    {
+      "id": "93605287-ff57-44ca-8e7c-32768dceb6d4",
+      "name": "Evaluate follow-up",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1250,
+        0
+      ],
+      "parameters": {
+        "jsCode": "function evaluateFollowup(focus, baseline, previous, measurement) {\n  const { mathScore, attendedDays } = measurement;\n  let next = focus;\n  if (attendedDays >= 4) {\n    if (focus === 'fractions' && mathScore >= 70 && mathScore - baseline.mathScore >= 10) next = 'word-problems';\n    if (focus === 'word-problems') {\n      if (mathScore < 70) next = 'fractions';\n      else if (mathScore >= 78 && previous.mathScore >= 75) next = 'mixed-review';\n    }\n    if (focus === 'mixed-review') {\n      if (mathScore < 75) next = 'word-problems';\n      else if (mathScore >= 85) next = 'independent';\n    }\n    if (focus === 'independent' && mathScore < 80) next = 'mixed-review';\n  }\n  return {\n    ...measurement,\n    mathChange: mathScore - baseline.mathScore,\n    attendanceChange: attendedDays - baseline.attendedDays,\n    focus: next,\n  };\n}\nfunction buildRoadmap(plan, baseline, checkpoints) {\n  const projected = ['fractions', 'fractions', 'word-problems', 'word-problems', 'word-problems',\n    'mixed-review', 'mixed-review', 'independent'];\n  const mathTargets = [60, 68, 72, 74, 76, 78, 82, 85];\n  const weeks = [];\n  let focus = plan.focus;\n  let previous = baseline;\n  let evaluation = null;\n  for (let index = 0; index < 8; index++) {\n    const measurement = index === 0 ? baseline : checkpoints[index - 1] ?? null;\n    const scheduledFocus = index > checkpoints.length + 1 && plan.focus === 'fractions' ? projected[index] : focus;\n    const shorter = scheduledFocus === 'mixed-review' || scheduledFocus === 'independent';\n    const sessions = shorter ? (scheduledFocus === 'mixed-review' ? 2 : 1) : plan.sessions;\n    const minutes = scheduledFocus === 'independent' ? 15 : plan.minutes;\n    weeks.push({\n      week: index + 1,\n      focus: scheduledFocus,\n      sessions,\n      minutes,\n      mathTarget: Math.max(baseline.mathScore, mathTargets[index]),\n      attendanceTarget: index < 4 ? 4 : 5,\n      measurement,\n    });\n    if (index > 0 && measurement) {\n      evaluation = evaluateFollowup(focus, baseline, previous, measurement);\n      focus = evaluation.focus;\n      previous = measurement;\n    }\n  }\n  return { weeks, evaluation };\n}\nconst data = $input.first().json;\nif (data.statusCode === 200) {\n  const roadmap = buildRoadmap(data.body.plan, data.current, data.checkpoints);\n  data.body.roadmap = roadmap.weeks;\n  if (roadmap.evaluation) data.body.evaluation = roadmap.evaluation;\n}\nreturn [{ json: { statusCode: data.statusCode, body: data.body } }];"
+      }
+    },
+    {
+      "id": "95403304-6230-4f6a-851e-aafd8ef4e004",
+      "name": "Return detection",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1500,
+        0
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json.body) }}",
+        "options": {
+          "responseCode": "={{ $json.statusCode }}"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Receive observations": {
+      "main": [
+        [
+          {
+            "node": "Detect risk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect risk": {
+      "main": [
+        [
+          {
+            "node": "Diagnose case",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Diagnose case": {
+      "main": [
+        [
+          {
+            "node": "Plan intervention",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Plan intervention": {
+      "main": [
+        [
+          {
+            "node": "Choose resources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Choose resources": {
+      "main": [
+        [
+          {
+            "node": "Evaluate follow-up",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate follow-up": {
+      "main": [
+        [
+          {
+            "node": "Return detection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none",
+    "saveDataErrorExecution": "none",
+    "saveManualExecutions": false
+  }
+}

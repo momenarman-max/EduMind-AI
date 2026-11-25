@@ -1,0 +1,166 @@
+/* The editorial shell and student catalogue reuse the dashboard palette. */
+.masthead { position: relative; z-index: 3; }
+.nav-band { position: sticky; inset-block-start: 0; z-index: 2; }
+.menu-trigger { display: none; }
+.nav-sheet, .student-dialog {
+  color: var(--ink); background: var(--card); border: 1px solid var(--line);
+  border-radius: 18px; padding: clamp(18px, 4vw, 31px);
+}
+dialog::backdrop { background: #112c24a6; }
+.nav-sheet { width: min(430px, calc(100% - 22px)); }
+.nav-sheet .site-nav { display: grid; gap: 2px; margin-block-start: 14px; }
+.nav-sheet .site-nav a { justify-content: start; padding-inline: 10px; text-align: start; }
+.dialog-heading { display: flex; justify-content: space-between; align-items: start; gap: 14px; }
+.dialog-close {
+  min-width: 44px; min-height: 44px; background: #edf4e9; color: var(--green);
+  border: 1px solid var(--line); border-radius: 8px; font-size: 22px; line-height: 1;
+}
+.student-dialog { width: min(640px, calc(100% - 24px)); max-block-size: calc(100dvh - 28px); }
+.student-dialog[open], .nav-sheet[open] { animation: sheet-in .26s ease both; }
+@keyframes sheet-in { from { opacity: 0; transform: translateY(11px); } to { opacity: 1; transform: none; } }
+main[data-screen="overview"] { padding-block-start: clamp(18px, 5vw, 70px); }
+.editorial-figure, .cover-actions, .workflow-guide { display: none; }
+main[data-screen="overview"] .intro {
+  display: grid; grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr);
+  align-items: center; gap: clamp(25px, 5vw, 82px); margin-block-end: clamp(25px, 6vw, 80px);
+}
+main[data-screen="overview"] .intro h1 {
+  font-size: clamp(40px, 5.5vw, 86px);
+  line-height: 1.02;
+  letter-spacing: -.045em;
+  overflow-wrap: normal;
+}
+html[lang="ar"] main[data-screen="overview"] .intro h1 {
+  font-size: clamp(46px, 5.3vw, 81px); line-height: 1.08; letter-spacing: 0;
+}
+.intro-copy { min-width: 0; }
+.intro-copy > p { max-width: 45ch; }
+main[data-screen="overview"] .intro-copy > p { font-size: clamp(16px, 1.45vw, 20px); }
+main[data-screen="overview"] .cover-actions { display: flex; }
+.cover-actions { gap: 14px; align-items: center; flex-wrap: wrap; margin-block-start: 23px; }
+.cover-actions a { color: var(--green); text-underline-offset: 4px; font-weight: 700; }
+.cover-actions a.button { color: #fff; }
+.intro-copy > .live-link { display: inline-block; }
+main[data-screen="overview"] .intro-copy > .live-link { display: none; }
+main[data-screen="overview"] .editorial-figure { display: block; }
+.editorial-figure { margin: 0; min-width: 0; }
+.cover-art {
+  --cover-progress: 0;
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 1.2;
+  border-radius: calc(14px + var(--cover-progress) * 46%) calc(14px + var(--cover-progress) * 46%) 14px 14px;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 33px, #f4f9da1c 34px 35px),
+    repeating-linear-gradient(0deg, transparent 0 33px, #f4f9da1c 34px 35px),
+    radial-gradient(ellipse at 20% 18%, #55755a, #193e31 72%);
+}
+.cover-art img {
+  position: absolute; inset: 0; display: block; width: 100%; height: 100%;
+  object-fit: cover; opacity: 0; transition: opacity .3s ease;
+}
+.cover-art[data-chapter="0"] [data-scene="0"],
+.cover-art[data-chapter="1"] [data-scene="1"],
+.cover-art[data-chapter="2"] [data-scene="2"] {
+  opacity: 1; z-index: 1;
+}
+.editorial-figure figcaption {
+  font-size: 14px; color: var(--muted); border-block-end: 1px solid var(--line);
+}
+#cover-caption { margin: 8px 0 10px; }
+.chapter-control { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin-block-start: 9px; }
+.chapter-control button, .view-options button {
+  background: transparent; border: 1px solid var(--line); border-radius: 7px;
+  padding: 6px 10px; min-height: 38px; color: var(--green); font-size: 14px;
+}
+.chapter-control button {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px; min-height: 48px; font-weight: 700; text-align: start; line-height: 1.25;
+}
+.chapter-control button img { width: clamp(30px, 4vw, 58px); height: 36px; border-radius: 4px; object-fit: cover; }
+.chapter-control button:hover { border-color: var(--green); }
+.chapter-control button[aria-pressed="true"], .view-options button[aria-pressed="true"] {
+  background: var(--dark); color: #fff; border-color: var(--dark);
+}
+main[data-screen="overview"] .workflow-guide { display: block; }
+.workflow-guide { margin-block-end: clamp(22px, 4vw, 44px); }
+.workflow-guide h2 { margin-block: 0 12px; font-size: clamp(22px, 3vw, 32px); }
+.chapters {
+  display: grid; margin: 0; padding: 0; list-style: none;
+  grid-template-columns: repeat(3, minmax(0, 1fr)); border-block: 1px solid var(--line);
+}
+.chapters li { padding: 17px 14px 20px; }
+.chapters li:first-child { padding-inline-start: 0; }
+.chapters li + li { border-inline-start: 1px solid var(--line); }
+.chapters strong { font-weight: 750; color: var(--green); }
+.chapters p { margin: 5px 0 0; color: var(--muted); line-height: 1.55; }
+#workspace-start { scroll-margin-top: 85px; }
+#screen-students { display: block; }
+.roster-toolbar {
+  display: flex; align-items: end; flex-wrap: wrap; gap: 12px 18px;
+  padding-block: 16px; border-block-end: 1px solid var(--line);
+}
+.roster-search { display: grid; flex: 1 1 230px; gap: 5px; font-size: 14px; }
+.roster-search input {
+  width: 100%; min-height: 44px; padding: 8px 11px; font: inherit; color: var(--ink);
+  background: #fff; border: 1px solid #9ab2a1; border-radius: 8px;
+}
+.view-options { display: flex; flex-wrap: wrap; gap: 6px; }
+.student-list[data-view="gallery"] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.student-list button { min-width: 0; gap: 7px; }
+.student-list[data-view="gallery"] button {
+  min-height: 162px; padding: 14px; display: flex; align-items: flex-start; justify-content: space-between;
+  flex-direction: column; background: #edf4e9;
+}
+.student-list[data-view="notebook"] button {
+  border-inline-start: 4px solid #86aa8b; min-height: 58px;
+}
+.student-list[data-view="index"] { gap: 0; }
+.student-list[data-view="index"] button {
+  min-height: 45px; border: 0; border-block-end: 1px solid var(--line); border-radius: 0; background: transparent;
+}
+.student-list button .roster-mark {
+  display: grid; place-items: center; width: 39px; height: 39px; border-radius: 50%;
+  background: #dce9d7; color: #174332; font-weight: 750;
+}
+.student-list[data-view="index"] .roster-mark { display: none; }
+.student-list[data-view="gallery"] .roster-title { display: grid; gap: 7px; }
+.student-list[data-view="notebook"] .roster-title { display: flex; gap: 10px; align-items: center; }
+.student-list .student-value { color: var(--green); font-weight: 750; }
+.student-list .form-hint { grid-column: 1 / -1; }
+#student-profile .comparison { margin-block: 17px; }
+:root { view-transition-name: none; }
+main { view-transition-name: workspace; }
+::view-transition-old(workspace) { animation: workspace-leave .18s ease both; }
+::view-transition-new(workspace) { animation: workspace-enter .28s ease both; }
+@keyframes workspace-leave { to { opacity: 0; transform: translateY(-5px); } }
+@keyframes workspace-enter { from { opacity: 0; transform: translateY(8px); } }
+@media (min-width: 941px) and (min-height: 680px) {
+  main[data-screen="overview"] .intro { min-block-size: 540px; align-items: start; }
+  main[data-screen="overview"] .intro-copy { padding-block-start: clamp(20px, 10vh, 130px); }
+  .editorial-figure { position: sticky; inset-block-start: 70px; }
+}
+@media (max-width: 760px) {
+  main[data-screen="overview"] .intro { grid-template-columns: minmax(0, 1fr); gap: 19px; }
+  .cover-art { aspect-ratio: 1.42; border-radius: 14px; }
+  .menu-trigger {
+    display: flex; align-items: center; gap: 8px; min-height: 44px; margin-block: 5px;
+    color: var(--green); background: transparent; border: 1px solid var(--line); border-radius: 8px; padding-inline: 10px;
+  }
+  .nav-band > .site-nav { display: none; }
+  .chapters { grid-template-columns: 1fr; }
+  .chapters li { padding: 12px 0; }
+  .chapters li + li { border-inline-start: 0; border-block-start: 1px solid var(--line); }
+  .chapter-control button { flex-direction: column; align-items: stretch; text-align: center; gap: 5px; }
+  .chapter-control button img { width: 100%; height: 42px; }
+  .student-list[data-view="gallery"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 390px) {
+  .student-list[data-view="gallery"] { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .editorial-figure { position: static; }
+  .cover-art { border-radius: 14px; }
+  .cover-art img { transition: none; }
+  ::view-transition-old(workspace), ::view-transition-new(workspace) { animation: none; }
+}

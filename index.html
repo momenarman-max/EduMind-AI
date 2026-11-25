@@ -350,6 +350,7 @@
       *, *::before, *::after { animation: none !important; transition: none !important; }
     }
   </style>
+  <link rel="stylesheet" href="editorial.css">
 </head>
 <body>
   <a class="skip" id="skip" href="#main" data-copy="skip">انتقل إلى المحتوى</a>
@@ -368,6 +369,11 @@
     </div>
   </header>
   <div class="nav-band">
+    <div class="shell">
+      <button class="menu-trigger" id="menu-toggle" type="button" aria-controls="mobile-nav" aria-expanded="false">
+        <span aria-hidden="true">☰</span><span id="current-menu-label" data-copy="overview">نظرة عامة</span>
+      </button>
+    </div>
     <nav class="shell site-nav" data-label="navigation" aria-label="أقسام اللوحة">
       <a href="#overview" data-route="overview" aria-current="page"><span class="nav-mark" aria-hidden="true">▦</span><span data-copy="overview">نظرة عامة</span></a>
       <a href="#students" data-route="students"><span class="nav-mark" aria-hidden="true">▤</span><span data-copy="students">الطلاب</span></a>
@@ -375,17 +381,56 @@
       <a href="#followup" data-route="followup"><span class="nav-mark" aria-hidden="true">↗</span><span data-copy="followup">المتابعة</span></a>
     </nav>
   </div>
+  <dialog class="nav-sheet" id="mobile-nav" aria-labelledby="menu-title">
+    <div class="dialog-heading">
+      <h2 id="menu-title" data-copy="navigation">أقسام اللوحة</h2>
+      <button type="button" class="dialog-close" data-close="mobile-nav" data-label="closeDialog" aria-label="إغلاق">×</button>
+    </div>
+    <nav class="site-nav" data-label="navigation">
+      <a href="#overview" data-route="overview" data-copy="overview">نظرة عامة</a>
+      <a href="#students" data-route="students" data-copy="students">الطلاب</a>
+      <a href="#workflow" data-route="workflow" data-copy="workflow">مسار الوكلاء</a>
+      <a href="#followup" data-route="followup" data-copy="followup">المتابعة</a>
+      <a href="n8n-flow.html" data-copy="workflowMap">شاهد مخطط n8n</a>
+    </nav>
+  </dialog>
   <main class="shell" id="main">
     <div class="intro">
-      <h1 id="heading" tabindex="-1">لوحة المعلّم</h1>
-      <p id="introduction">تابع حالة الطالب من رصد التراجع إلى تقييم أثر خطة الدعم.</p>
+      <div class="intro-copy">
+        <h1 id="heading" tabindex="-1">لوحة المعلّم لمتابعة تقدّم الطلاب</h1>
+        <p id="introduction">أدخل علامات الرياضيات وأيام الحضور لكل طالب. تساعدك اللوحة على اكتشاف التراجع، وتقترح خطة دعم لثمانية أسابيع تتابع أثرها أسبوعًا بأسبوع.</p>
+        <div class="cover-actions">
+          <a class="button" id="jump-workspace" href="#workspace-start" data-copy="openWorkspace">افتح لوحة المعلّم</a>
+          <a href="#students/new" data-copy="addStudent">إضافة طالب</a>
+        </div>
         <a class="live-link" href="n8n-flow.html" data-copy="workflowMap">شاهد مخطط n8n</a>
+      </div>
+      <figure class="editorial-figure">
+        <div class="cover-art" id="cover-art" data-chapter="0" aria-hidden="true">
+          <img data-scene="0" src="academic-measure.webp" alt="" width="1500" height="1000" fetchpriority="high">
+          <img data-scene="1" src="academic-support.webp" alt="" width="1500" height="1000">
+          <img data-scene="2" src="academic-followup.webp" alt="" width="1500" height="1000">
+        </div>
+        <figcaption>
+          <div class="chapter-control" role="group" data-label="chapterControls">
+            <button type="button" data-chapter="0" aria-pressed="true"><img src="academic-measure.webp" alt="" width="48" height="36"><span>القياس</span></button>
+            <button type="button" data-chapter="1" aria-pressed="false"><img src="academic-support.webp" alt="" width="48" height="36"><span>الدعم</span></button>
+            <button type="button" data-chapter="2" aria-pressed="false"><img src="academic-followup.webp" alt="" width="48" height="36"><span>المتابعة</span></button>
+          </div>
+          <p id="cover-caption" aria-live="polite"></p>
+        </figcaption>
+      </figure>
     </div>
+    <section class="workflow-guide" aria-labelledby="guide-title">
+      <h2 id="guide-title" data-copy="guideTitle">كيف تستخدم اللوحة؟</h2>
+      <ol class="chapters" id="chapters"></ol>
+    </section>
+    <div id="workspace-start" tabindex="-1"></div>
 
     <div class="student-switch" id="student-switch">
       <label for="student-picker" data-copy="activeStudent">الطالب الحالي</label>
       <select id="student-picker"></select>
-      <a href="#students" data-copy="addStudent">إضافة طالب</a>
+      <a href="#students/new" data-copy="addStudent">إضافة طالب</a>
     </div>
 
     <section class="card integration" id="integration" aria-labelledby="integration-title">
@@ -485,14 +530,28 @@
 
     <section class="screen workflow-grid" id="screen-students" aria-labelledby="heading" hidden>
       <section class="card" aria-labelledby="roster-heading">
-        <h2 id="roster-heading" data-copy="rosterTitle">سجلّ الطلاب</h2>
+        <div class="section-head">
+          <h2 id="roster-heading" data-copy="rosterTitle">سجلّ الطلاب</h2>
+          <a href="#students/new" class="button" data-copy="addStudent">إضافة طالب</a>
+        </div>
         <p class="form-hint" id="roster-note" data-copy="storageNote">السجل محفوظ في هذا المتصفح. استخدم رموزًا بدل الأسماء الكاملة.</p>
+        <div class="roster-toolbar">
+          <label class="roster-search"><span data-copy="searchStudents">ابحث في سجلّ الطلاب</span><input type="search" id="roster-search" autocomplete="off"></label>
+          <div class="view-options" role="group" data-label="rosterViews">
+            <button type="button" data-roster-view="gallery" data-copy="galleryView" aria-pressed="true">البطاقات</button>
+            <button type="button" data-roster-view="notebook" data-copy="notebookView" aria-pressed="false">الدفتر</button>
+            <button type="button" data-roster-view="index" data-copy="indexView" aria-pressed="false">الفهرس</button>
+          </div>
+        </div>
         <div class="actions"><button class="button subtle" id="load-shared" type="button" data-copy="loadShared">تحميل سجل Google Sheets</button></div>
         <p class="form-hint" id="shared-status" role="status"></p>
-        <ul class="student-list" id="student-list"></ul>
+        <ul class="student-list" id="student-list" data-view="gallery"></ul>
       </section>
-      <section class="card" aria-labelledby="new-student-heading">
-        <h2 id="new-student-heading" data-copy="addStudent">إضافة طالب</h2>
+      <dialog class="card student-dialog" id="student-entry" aria-labelledby="new-student-heading">
+        <div class="dialog-heading">
+          <h2 id="new-student-heading" data-copy="addStudent">إضافة طالب</h2>
+          <button type="button" class="dialog-close" data-close="student-entry" data-label="closeDialog" aria-label="إغلاق">×</button>
+        </div>
         <form class="student-form" id="student-form" aria-describedby="measurement-help">
           <label><span data-copy="studentCode">رمز الطالب</span><input id="new-code" dir="ltr" type="text" minlength="3" maxlength="24" pattern="[A-Za-z0-9_\-]{3,24}" placeholder="S-001" autocomplete="off" required></label>
           <p class="form-hint" id="measurement-help" data-copy="measurementHelp">خذ العلامة من اختبار قصير على المقياس نفسه، والحضور من سجلّ الأسبوع. 12 من 15 تساوي 80 من 100.</p>
@@ -518,7 +577,19 @@
           <p class="form-error" id="student-form-error" role="alert" hidden></p>
           <div class="actions"><button class="button" id="save-student" type="submit" data-copy="saveStudent">احفظ الطالب وافتح حالته</button></div>
         </form>
-      </section>
+      </dialog>
+      <dialog class="card student-dialog" id="student-profile" aria-labelledby="profile-title">
+        <div class="dialog-heading">
+          <h2 id="profile-title" tabindex="-1"></h2>
+          <button type="button" class="dialog-close" data-close="student-profile" data-label="closeDialog" aria-label="إغلاق">×</button>
+        </div>
+        <p class="form-hint" id="profile-progress"></p>
+        <div class="comparison">
+          <div><p data-copy="math">علامة الرياضيات</p><strong id="profile-score"></strong></div>
+          <div><p data-copy="attendance">الحضور الأسبوعي</p><strong id="profile-days"></strong></div>
+        </div>
+        <button class="button" type="button" id="open-profile" data-copy="openProfile">افتح بطاقة الطالب</button>
+      </dialog>
     </section>
 
     <section class="screen workflow-grid" id="screen-workflow" aria-labelledby="heading" hidden>
@@ -589,6 +660,20 @@
       ar: {
         skip: 'انتقل إلى المحتوى', language: 'لغة الواجهة', navigation: 'أقسام اللوحة',
         demo: 'بيانات تجريبية', overview: 'نظرة عامة', workflow: 'مسار الوكلاء', followup: 'المتابعة',
+        coverHeading: "لوحة المعلّم لمتابعة تقدّم الطلاب",
+        openWorkspace: "افتح لوحة المعلّم",
+        closeDialog: "إغلاق النافذة",
+        chapterControls: "صور مراحل المتابعة",
+        guideTitle: "كيف تستخدم اللوحة؟",
+        coverCaptions: ["تصحيح اختبار الرياضيات ومراجعة الحضور.", "شرح الكسور للطالب والتمرّن معًا.", "مقارنة نتائج الطالب من أسبوع إلى آخر."],
+        searchStudents: "ابحث باسم الحالة أو رمز الطالب",
+        rosterViews: "عرض سجل الطلاب",
+        galleryView: "البطاقات",
+        notebookView: "الدفتر",
+        indexView: "الفهرس",
+        openProfile: "افتح بطاقة الطالب",
+        noSearchResults: "ما في نتائج لهذا البحث.",
+        coverChapters: [["القياس","اختر طالبًا وسجّل علاماته في الرياضيات وأيام حضوره. تعرض اللوحة مقدار التغيّر بين القياسات."],["الدعم","شغّل التحليل لعرض جوانب الصعوبة المحتملة وخطة مقترحة فيها جلسات وتمارين."],["المتابعة","أدخل العلامة والحضور من جديد كل أسبوع. قارن النتيجة بقياس البداية وراجع ما يحتاج إلى دعم إضافي."]],
         workflowMap: 'شاهد مخطط n8n',
         hostedMode: ['تشغيل متصفحي', 'تعمل قواعد الوكلاء في هذا المتصفح. القياسات المدخلة تبقى فيه.'],
         loadShared: "تحميل سجل Google Sheets",
@@ -675,7 +760,7 @@
           local: ['عرض محلي', 'يعمل الحساب في المتصفح. افتح اللوحة المتصلة لتشغيل المسار عبر n8n.'],
           error: ['تعذّر تنفيذ التحليل', 'لم تصل نتيجة صالحة من n8n. أعد تشغيل التحليل للمحاولة مرة أخرى.'],
         },
-        heading: 'لوحة المعلّم', overviewIntro: 'تابع حالة الطالب من رصد التراجع إلى تقييم أثر خطة الدعم.',
+        heading: 'لوحة المعلّم', overviewIntro: 'أدخل علامات الرياضيات وأيام الحضور لكل طالب. تساعدك اللوحة على اكتشاف التراجع، وتقترح خطة دعم لثمانية أسابيع تتابع أثرها أسبوعًا بأسبوع.',
         workflowIntro: 'اختر أي وكيل للاطّلاع على مهمته ونتيجة عمله.',
         followupIntro: 'تابع العلامة والحضور أسبوعيًا واضبط خطة الدعم حسب النتائج.',
         caseLabel: 'حالة الطالب', student: 'آدم خليل', initials: 'آخ', grade: 'الصف الثامن',
@@ -719,6 +804,20 @@
       en: {
         skip: 'Skip to content', language: 'Interface language', navigation: 'Dashboard sections',
         demo: 'Demo data', overview: 'Overview', workflow: 'Agent workflow', followup: 'Follow-up',
+        coverHeading: "Track your students’ progress",
+        openWorkspace: "Open teacher dashboard",
+        closeDialog: "Close dialog",
+        chapterControls: "Images of each workflow step",
+        guideTitle: "How the dashboard works",
+        coverCaptions: ["Marking a math quiz and checking attendance.", "Working through fractions with a student.", "Comparing a student’s results week by week."],
+        searchStudents: "Search by case name or student code",
+        rosterViews: "Student directory views",
+        galleryView: "Cards",
+        notebookView: "Notebook",
+        indexView: "Index",
+        openProfile: "Open student dashboard",
+        noSearchResults: "No cases match this search.",
+        coverChapters: [["Measure","Choose a student and log their math scores and days attended. The dashboard shows what changed between entries."],["Support","Run the analysis to see where the student may be struggling and get a suggested plan with sessions and exercises."],["Follow up","Enter updated scores and attendance each week. Compare them with the starting point and review where the student needs more support."]],
         workflowMap: 'View the n8n workflow',
         hostedMode: ['Browser mode', 'Agent rules run in this browser. Measurements are kept here.'],
         loadShared: "Load Google Sheets roster",
@@ -805,7 +904,7 @@
           local: ['Local preview', 'The analysis runs in your browser. Open the connected dashboard to run it through n8n.'],
           error: ['Analysis unavailable', 'n8n did not return a valid result. Run the analysis again to retry.'],
         },
-        heading: 'Teacher dashboard', overviewIntro: 'Follow a student case from the first warning signs to the results of the support plan.',
+        heading: 'Teacher dashboard', overviewIntro: 'Enter each student’s math scores and days attended. The teacher dashboard helps you spot setbacks, suggests an eight-week support plan, and lets you track progress each week.',
         workflowIntro: 'Select an agent to see its role and findings.',
         followupIntro: 'Review the changes in scores and attendance and see the updated support plan.',
         caseLabel: 'Student case', student: 'Adam Khalil', initials: 'AK', grade: 'Eighth grade',
@@ -849,6 +948,20 @@
       uk: {
         skip: 'Перейти до вмісту', language: 'Мова інтерфейсу', navigation: 'Розділи панелі',
         demo: 'Демонстраційні дані', overview: 'Огляд', workflow: 'Робота агентів', followup: 'Прогрес',
+        coverHeading: "Відстежуйте прогрес учнів",
+        openWorkspace: "Відкрити панель учителя",
+        closeDialog: "Закрити вікно",
+        chapterControls: "Розділи роботи вчителя",
+        searchStudents: "Знайти учня за назвою запису або кодом",
+        rosterViews: "Вигляди списку учнів",
+        galleryView: "Картки",
+        notebookView: "Зошит",
+        indexView: "Покажчик",
+        openProfile: "Відкрити картку учня",
+        noSearchResults: "За цим запитом записів немає.",
+        guideTitle: "Як працює панель",
+        coverCaptions: ["Перевірка роботи з математики та відвідуваності.", "Спільна робота з учнем над дробами.", "Порівняння результатів учня за тижнями."],
+        coverChapters: [["Вимірювання","Оберіть учня та внесіть оцінки з математики й кількість відвіданих днів. Панель покаже, що змінилося."],["Підтримка","Запустіть аналіз, щоб побачити можливі труднощі й отримати план занять і вправ."],["Прогрес","Щотижня оновлюйте оцінку й відвідуваність. Порівнюйте їх із початковими показниками та визначайте, де потрібна додаткова підтримка."]],
         workflowMap: 'Переглянути схему n8n',
         hostedMode: ['Режим браузера', 'Правила агентів працюють у браузері. Введені показники зберігаються тут.'],
         loadShared: "Завантажити список із Google Sheets",
@@ -935,7 +1048,7 @@
           local: ['Локальний перегляд', 'Аналіз виконується в браузері. Відкрийте підключену панель, щоб запустити його через n8n.'],
           error: ['Аналіз недоступний', 'n8n не повернув дійсного результату. Запустіть аналіз ще раз.'],
         },
-        heading: 'Панель учителя', overviewIntro: 'Стежте за успішністю учня від перших ознак спаду до оцінки результатів підтримки.',
+        heading: 'Панель учителя', overviewIntro: 'Внесіть оцінки з математики та кількість відвіданих днів кожного учня. Панель учителя допоможе виявити спад, запропонує план підтримки на вісім тижнів і покаже щотижневий прогрес.',
         workflowIntro: 'Виберіть агента, щоб переглянути його завдання та висновки.',
         followupIntro: 'Перегляньте зміни в успішності й відвідуваності та оновлений план підтримки.',
         caseLabel: 'Профіль учня', student: 'Адам Халіль', initials: 'АХ', grade: '8-й клас',
@@ -1052,6 +1165,15 @@
     const $ = selector => document.querySelector(selector);
     const all = selector => [...document.querySelectorAll(selector)];
     const heading = $('#heading');
+    const main = $('#main');
+    const coverArt = $('#cover-art');
+    const chapterButtons = all('.chapter-control button');
+    const rosterSearch = $('#roster-search');
+    const rosterList = $('#student-list');
+    const entryDialog = $('#student-entry');
+    const profileDialog = $('#student-profile');
+    const mobileNav = $('#mobile-nav');
+    const menuToggle = $('#menu-toggle');
     const languagePicker = $('#language');
     const studentPicker = $('#student-picker');
     const studentForm = $('#student-form');
@@ -1114,6 +1236,83 @@
     let evaluationFailure = 'evaluationError';
     let checkpoints = [...activeStudent.checkpoints];
     let formFailure = '';
+    let rosterView = 'gallery';
+    let currentChapter = 0;
+    let profileStudent = null;
+    let focusAfterProfile = null;
+    let renderedRoute = '';
+    let navigationVersion = 0;
+    let currentTransition;
+    const readingPositions = new Map();
+
+    function renderCover(t) {
+      coverArt.dataset.chapter = currentChapter;
+      const caption = $('#cover-caption');
+      if (caption.textContent !== t.coverCaptions[currentChapter]) {
+        caption.textContent = t.coverCaptions[currentChapter];
+      }
+      chapterButtons.forEach((button, index) => {
+        button.querySelector('span').textContent = t.coverChapters[index][0];
+        button.setAttribute('aria-pressed', String(index === currentChapter));
+      });
+      $('#chapters').replaceChildren(...t.coverChapters.map(([title, text]) => {
+        const chapter = document.createElement('li');
+        const label = document.createElement('strong');
+        const body = document.createElement('p');
+        label.textContent = title;
+        body.textContent = text;
+        chapter.append(label, body);
+        return chapter;
+      }));
+    }
+
+    function renderDirectory(t) {
+      const students = [demoStudent, ...roster, ...sharedRoster];
+      const query = rosterSearch.value.trim().toLocaleLowerCase(language);
+      const entries = students.filter(student =>
+        (student.code || t.sampleStudent).toLocaleLowerCase(language).includes(query));
+      const viewButtons = all('[data-roster-view]');
+      viewButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.rosterView === rosterView)));
+      rosterList.dataset.view = rosterView;
+      rosterList.replaceChildren(...entries.map(student => {
+        const item = document.createElement('li');
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.studentCode = selectorValue(student);
+        const name = document.createElement('span');
+        name.className = 'roster-title';
+        const avatar = document.createElement('span');
+        avatar.className = 'roster-mark';
+        avatar.setAttribute('aria-hidden', 'true');
+        avatar.textContent = student.code.slice(0, 2) || t.initials;
+        const code = document.createElement('bdi');
+        code.className = 'student-value';
+        code.textContent = student.code || t.sampleStudent;
+        name.append(avatar, code);
+        const progress = document.createElement('small');
+        progress.textContent = (student.source === 'sheets' ? 'Google Sheets · ' : '') +
+          t.roadmapProgress(student.checkpoints.length + 1);
+        button.append(name, progress);
+        item.append(button);
+        return item;
+      }));
+      if (!entries.length) {
+        const empty = document.createElement('li');
+        empty.className = 'form-hint';
+        empty.textContent = t.noSearchResults;
+        rosterList.append(empty);
+      }
+    }
+
+    function renderProfile(t) {
+      if (!profileStudent) return;
+      const measurement = profileStudent.checkpoints.at(-1) ?? profileStudent.observations.current;
+      $('#profile-title').textContent = profileStudent.code || t.sampleStudent;
+      $('#profile-progress').textContent = t.roadmapProgress(profileStudent.checkpoints.length + 1);
+      $('#profile-score').textContent = measurement.mathScore + ' ' + t.scoreUnit;
+      $('#profile-days').textContent = measurement.attendedDays + ' ' + t.daysUnit;
+      $('#open-profile').disabled = running || evaluating;
+    }
 
     function loadSampleWeek() {
       const sample = activeStudent.code ? null : sampleWeeks[checkpoints.length];
@@ -1139,22 +1338,8 @@
       const failure = $('#student-form-error');
       failure.hidden = !formFailure;
       failure.textContent = t[formFailure] ?? '';
-      const entries = students.length ? students.map(student => {
-        const item = document.createElement('li');
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.dataset.studentCode = selectorValue(student);
-        button.disabled = busy;
-        const code = document.createElement('bdi');
-        code.textContent = student.code;
-        const progress = document.createElement('small');
-        progress.textContent = (student.source === 'sheets' ? 'Google Sheets · ' : '') +
-          t.roadmapProgress(student.checkpoints.length + 1);
-        button.append(code, progress);
-        item.append(button);
-        return item;
-      }) : [Object.assign(document.createElement('li'), { textContent: t.noStudents, className: 'form-hint' })];
-      $('#student-list').replaceChildren(...entries);
+      renderDirectory(t);
+      renderProfile(t);
       const source = activeStudent.source === 'sheets' ? 'Google Sheets' : t.manualCase;
       $('#case-source').textContent = activeStudent.code ? source : t.demo;
       $('#student').textContent = activeStudent.code || t.student;
@@ -1209,7 +1394,10 @@
       const lastWeek = checkpoints.length + 1;
       const total = completed + Number(allMeasured);
       const activeAgent = selectedAgent ?? completed;
-      const screenTitle = screen === 'overview' ? t.heading : t[screen];
+      const screenTitle = screen === 'overview' ? t.coverHeading : t[screen];
+      main.dataset.screen = screen;
+      $('#current-menu-label').textContent = t[screen];
+      if (screen === 'overview') renderCover(t);
       const mode = standalone ? 'local' : detection ? 'verified' : detectionFailed ? 'error' : running ? 'running' : 'ready';
       const [connectionLabel, connectionNote] = hosted ? t.hostedMode : t.connection[mode];
       const signed = new Intl.NumberFormat(language, { signDisplay: 'exceptZero' });
@@ -1376,24 +1564,118 @@
     }
 
     function readRoute(moveFocus) {
-      const agentRoute = /^#workflow\/([1-5])$/.exec(location.hash);
-      if (agentRoute) {
-        screen = 'workflow';
-        selectedAgent = Number(agentRoute[1]) - 1;
-      } else {
-        const route = location.hash.slice(1);
-        screen = ['students', 'followup', 'workflow'].includes(route) ? route : 'overview';
-      }
-      render();
-      if (moveFocus) {
-        if (agentRoute) {
-          $('#agent-heading').focus();
-        } else {
-          heading.focus({ preventScroll: true });
-          window.scrollTo(0, 0);
+      const hash = location.hash || '#overview';
+      if (renderedRoute && renderedRoute !== hash) readingPositions.set(renderedRoute, window.scrollY);
+      const version = ++navigationVersion;
+      const update = () => {
+        if (version !== navigationVersion) return;
+        const agentRoute = /^#workflow\/([1-5])$/.exec(hash);
+        const studentRoute = /^#students\/([^/]+)$/.exec(hash);
+        const route = hash.slice(1);
+        const addStudent = studentRoute?.[1] === 'new';
+        profileStudent = null;
+        if (studentRoute && !addStudent) {
+          try {
+            const code = decodeURIComponent(studentRoute[1]);
+            const record = findStudent(code === 'demo' ? '' : code);
+            if (record) profileStudent = record;
+          } catch {
+            profileStudent = null;
+          }
         }
+        screen = studentRoute ? 'students' : agentRoute ? 'workflow'
+          : ['students', 'followup', 'workflow'].includes(route) ? route : 'overview';
+        if (agentRoute) selectedAgent = Number(agentRoute[1]) - 1;
+        renderedRoute = hash;
+        if (entryDialog.open && !addStudent) entryDialog.close();
+        if (profileDialog.open && !profileStudent) profileDialog.close();
+        if (mobileNav.open) mobileNav.close();
+        render();
+        if (addStudent && !entryDialog.open) {
+          entryDialog.showModal();
+          $('#new-code').focus();
+        } else if (profileStudent && !profileDialog.open) {
+          profileDialog.showModal();
+          $('#profile-title').focus();
+        } else if (moveFocus && !addStudent && !profileStudent) {
+          const rosterReturn = screen === 'students' && focusAfterProfile !== null
+            ? all('#student-list button').find(button => button.dataset.studentCode === focusAfterProfile) : null;
+          if (rosterReturn) {
+            rosterReturn.focus({ preventScroll: true });
+            focusAfterProfile = null;
+          } else if (agentRoute) {
+            $('#agent-heading').focus();
+          } else {
+            heading.focus({ preventScroll: true });
+          }
+          if (!agentRoute) window.scrollTo(0, readingPositions.get(hash) ?? 0);
+        }
+        paintCover();
+      };
+      currentTransition?.skipTransition();
+      if (moveFocus && !reducedMotion.matches && document.startViewTransition) {
+        currentTransition = document.startViewTransition(update);
+      } else {
+        update();
       }
     }
+
+    const desktopCover = matchMedia('(min-width: 941px) and (min-height: 680px)');
+    let coverFrame = 0;
+    function paintCover() {
+      if (coverFrame) return;
+      coverFrame = requestAnimationFrame(() => {
+        coverFrame = 0;
+        const progress = screen === 'overview' && desktopCover.matches && !reducedMotion.matches
+          ? Math.min(1, Math.max(0, window.scrollY / 415)) : 0;
+        coverArt.style.setProperty('--cover-progress', progress.toFixed(3));
+      });
+    }
+    window.addEventListener('scroll', paintCover, { passive: true });
+    desktopCover.addEventListener('change', paintCover);
+    reducedMotion.addEventListener('change', paintCover);
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    chapterButtons.forEach((button, index) => button.addEventListener('click', () => {
+      currentChapter = index;
+      renderCover(copy[language]);
+    }));
+    $('#jump-workspace').addEventListener('click', event => {
+      event.preventDefault();
+      $('#run').focus({ preventScroll: true });
+      $('#workspace-start').scrollIntoView({ behavior: reducedMotion.matches ? 'instant' : 'smooth' });
+    });
+    rosterSearch.addEventListener('input', () => renderDirectory(copy[language]));
+    all('[data-roster-view]').forEach(button => button.addEventListener('click', () => {
+      rosterView = button.dataset.rosterView;
+      renderDirectory(copy[language]);
+    }));
+    menuToggle.addEventListener('click', () => {
+      mobileNav.showModal();
+      menuToggle.setAttribute('aria-expanded', 'true');
+    });
+    mobileNav.addEventListener('close', () => menuToggle.setAttribute('aria-expanded', 'false'));
+    mobileNav.addEventListener('click', event => {
+      if (event.target.closest('a') || event.target === mobileNav) mobileNav.close();
+    });
+    function closeStudentDialog() { location.hash = 'students'; }
+    all('[data-close]').forEach(button => button.addEventListener('click', () => {
+      const dialog = document.getElementById(button.dataset.close);
+      if (dialog === mobileNav) dialog.close();
+      else closeStudentDialog();
+    }));
+    [profileDialog, entryDialog].forEach(dialog => {
+      dialog.addEventListener('cancel', event => {
+        event.preventDefault();
+        closeStudentDialog();
+      });
+      dialog.addEventListener('click', event => {
+        if (event.target !== dialog) return;
+        const bounds = dialog.getBoundingClientRect();
+        if (event.clientX < bounds.left || event.clientX > bounds.right ||
+          event.clientY < bounds.top || event.clientY > bounds.bottom) closeStudentDialog();
+      });
+    });
+    $('#open-profile').addEventListener('click', () => activateStudent(profileStudent));
 
     languagePicker.addEventListener('change', () => {
       language = languagePicker.value;
@@ -1456,6 +1738,7 @@
         sharedRoster = students.map(student => ({ ...student, source: 'sheets' }));
         sharedState = configured ? 'sharedReady' : 'sharedNotConfigured';
         if (restoreCode) activateStudent(findStudent(restoreCode), false);
+        if (/^#students\/sheet(?:%3A|:)/i.test(location.hash)) readRoute(false);
       } catch {
         sharedState = 'sharedUnavailable';
       }
@@ -1466,7 +1749,9 @@
     studentPicker.addEventListener('change', () => activateStudent(findStudent(studentPicker.value)));
     $('#student-list').addEventListener('click', event => {
       const row = event.target.closest('button[data-student-code]');
-      if (row) activateStudent(findStudent(row.dataset.studentCode));
+      if (!row) return;
+      focusAfterProfile = row.dataset.studentCode;
+      location.hash = 'students/' + encodeURIComponent(row.dataset.studentCode || 'demo');
     });
     window.addEventListener('storage', event => {
       if (event.key !== null && !event.key.startsWith(studentPrefix)) return;
@@ -1618,6 +1903,7 @@
     applyLanguage();
     if (checkpoints.length) void runAnalysis(true);
     if (preferredStudent.startsWith('sheet:')) void loadSharedRoster(preferredStudent);
+    else if (/^#students\/sheet(?:%3A|:)/i.test(location.hash)) void loadSharedRoster();
   </script>
 </body>
 </html>

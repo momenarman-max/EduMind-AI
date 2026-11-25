@@ -107,6 +107,13 @@ main[data-screen="about"] .intro-copy > p { max-width: 64ch; }
 .about-layout img { width: 100%; height: auto; border-radius: 14px; }
 .about-layout h2 { font-size: clamp(22px, 3vw, 36px); margin-block: 0 10px; }
 .about-layout p { color: var(--muted); line-height: 1.75; margin-block: 0 20px; }
+.about-notes {
+  grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(24px, 5vw, 72px); padding-block-start: 24px; border-block-start: 1px solid var(--line);
+}
+.about-notes h2 { font-size: clamp(19px, 2vw, 25px); }
+.about-notes p { margin-block-end: 8px; }
+.about-notes a { color: var(--green); font-weight: 700; text-underline-offset: 4px; }
 #screen-students { display: block; }
 .roster-toolbar {
   display: flex; align-items: end; flex-wrap: wrap; gap: 12px 18px;
@@ -154,7 +161,8 @@ main { view-transition-name: workspace; }
 }
 @media (max-width: 760px) {
   .about-layout:not([hidden]) { grid-template-columns: minmax(0, 1fr); }
-  .about-layout section { grid-row: 1; }
+  .about-layout > section { grid-row: 1; }
+  .about-notes { grid-template-columns: minmax(0, 1fr); }
   main[data-screen="overview"] .intro { grid-template-columns: minmax(0, 1fr); gap: 19px; }
   .cover-art { aspect-ratio: 1.42; border-radius: 14px; }
   .menu-trigger {

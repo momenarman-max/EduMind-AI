@@ -658,10 +658,22 @@
         <h2 id="about-usage" data-copy="aboutUsage">كيف يساعد المعلّم؟</h2>
         <p data-copy="aboutDetails">يسجّل المعلّم علامات الرياضيات وأيام الحضور لكل طالب. تُظهر اللوحة التغيّر في النتائج وتقترح تمارين وجلسات دعم على مدى ثمانية أسابيع. يراجع المعلّم الاقتراحات ويختار ما يناسب الطالب، ثم يقارن نتائجه كل أسبوع.</p>
         <div class="actions">
-          <a class="button" href="https://github.com/momenarman-max/EduMind-AI" data-copy="aboutRepository">كود المشروع على GitHub</a>
+          <a class="button" href="#overview" data-copy="aboutDemo">افتح لوحة المشروع</a>
+          <a class="button subtle" href="https://github.com/momenarman-max/EduMind-AI" data-copy="aboutRepository">كود المشروع على GitHub</a>
           <a class="button subtle" href="n8n-flow.html" data-copy="workflowMap">شاهد مخطط n8n</a>
         </div>
       </section>
+      <div class="about-notes">
+        <section aria-labelledby="about-try">
+          <h2 id="about-try" data-copy="aboutTry">جرّب بحالة آدم</h2>
+          <p data-copy="aboutTryText">افتح اللوحة وشغّل التحليل على حالة آدم التجريبية. راجع خطة الدعم، ثم أدخل علامة وحضورًا جديدين في «المتابعة» لترى الفرق عن قياس البداية.</p>
+        </section>
+        <section aria-labelledby="about-tech">
+          <h2 id="about-tech" data-copy="aboutTech">التقنيات وطريقة التشغيل</h2>
+          <p data-copy="aboutTechText">تعمل اللوحة في المتصفح بثلاث لغات، وتُحفظ الإدخالات محليًا في النسخة الثابتة. يدعم خادم Node.js ربط n8n وGoogle Sheets وOpenAI عند إعداد مفاتيح الاتصال على الخادم.</p>
+          <a href="https://github.com/momenarman-max/EduMind-AI/blob/main/n8n/README.md" data-copy="aboutDocs">دليل تشغيل المشروع</a>
+        </section>
+      </div>
     </div>
     <div id="announcement" class="sr-only" role="status"></div>
   </main>
@@ -678,6 +690,12 @@
         aboutUsage: 'كيف يساعد المعلّم؟',
         aboutDetails: 'يسجّل المعلّم علامات الرياضيات وأيام الحضور لكل طالب. تُظهر اللوحة التغيّر في النتائج وتقترح تمارين وجلسات دعم على مدى ثمانية أسابيع. يراجع المعلّم الاقتراحات ويختار ما يناسب الطالب، ثم يقارن نتائجه كل أسبوع.',
         aboutRepository: 'كود المشروع على GitHub',
+        aboutDemo: 'افتح لوحة المشروع',
+        aboutTry: 'جرّب بحالة آدم',
+        aboutTryText: 'افتح اللوحة وشغّل التحليل على حالة آدم التجريبية. راجع خطة الدعم، ثم أدخل علامة وحضورًا جديدين في «المتابعة» لترى الفرق عن قياس البداية.',
+        aboutTech: 'التقنيات وطريقة التشغيل',
+        aboutTechText: 'تعمل اللوحة في المتصفح بثلاث لغات، وتُحفظ الإدخالات محليًا في النسخة الثابتة. يدعم خادم Node.js ربط n8n وGoogle Sheets وOpenAI عند إعداد مفاتيح الاتصال على الخادم.',
+        aboutDocs: 'دليل تشغيل المشروع',
         coverHeading: "لوحة المعلّم لمتابعة تقدّم الطلاب",
         openWorkspace: "افتح لوحة المعلّم",
         closeDialog: "إغلاق النافذة",
@@ -825,6 +843,12 @@
         aboutUsage: 'How does it help teachers?',
         aboutDetails: 'Teachers record each student’s math scores and attendance. The dashboard shows what changed and suggests eight weeks of exercises and support sessions. Teachers review the suggestions, choose what fits each student, and compare results each week.',
         aboutRepository: 'Project code on GitHub',
+        aboutDemo: 'Open the project dashboard',
+        aboutTry: 'Try the sample student case',
+        aboutTryText: 'Open the dashboard and run the analysis on the sample student. Review the support plan, then enter a new score and attendance in Follow up to see how they compare with the starting point.',
+        aboutTech: 'Technology and setup',
+        aboutTechText: 'The dashboard runs in the browser in three languages. The static edition saves entries locally. Configure credentials on the Node.js server to connect n8n, Google Sheets, and OpenAI.',
+        aboutDocs: 'Project setup guide',
         skip: 'Skip to content', language: 'Interface language', navigation: 'Dashboard sections',
         demo: 'Demo data', overview: 'Overview', workflow: 'Agent workflow', followup: 'Follow-up',
         coverHeading: "Track your students’ progress",
@@ -974,6 +998,12 @@
         aboutUsage: 'Як це допомагає вчителям?',
         aboutDetails: 'Учителі вносять оцінки з математики й відвідуваність кожного учня. Панель показує зміни та пропонує вправи й заняття на вісім тижнів. Учителі обирають доречні рекомендації та щотижня порівнюють результати.',
         aboutRepository: 'Код проєкту на GitHub',
+        aboutDemo: 'Відкрити панель проєкту',
+        aboutTry: 'Спробуйте навчальний приклад',
+        aboutTryText: 'Відкрийте панель і запустіть аналіз для демонстраційного учня. Перегляньте план підтримки, а потім оновіть оцінку й відвідуваність у розділі «Прогрес», щоб порівняти їх із початковими показниками.',
+        aboutTech: 'Технології та налаштування',
+        aboutTechText: 'Панель працює в браузері трьома мовами. Статична версія зберігає записи локально. Налаштуйте облікові дані на сервері Node.js, щоб підключити n8n, Google Sheets та OpenAI.',
+        aboutDocs: 'Посібник із налаштування',
         skip: 'Перейти до вмісту', language: 'Мова інтерфейсу', navigation: 'Розділи панелі',
         demo: 'Демонстраційні дані', overview: 'Огляд', workflow: 'Робота агентів', followup: 'Прогрес',
         coverHeading: "Відстежуйте прогрес учнів",

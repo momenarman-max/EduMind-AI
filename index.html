@@ -379,6 +379,7 @@
       <a href="#students" data-route="students"><span class="nav-mark" aria-hidden="true">▤</span><span data-copy="students">الطلاب</span></a>
       <a href="#workflow" data-route="workflow"><span class="nav-mark" aria-hidden="true">◎</span><span data-copy="workflow">مسار الوكلاء</span></a>
       <a href="#followup" data-route="followup"><span class="nav-mark" aria-hidden="true">↗</span><span data-copy="followup">المتابعة</span></a>
+      <a href="#about" data-route="about"><span class="nav-mark" aria-hidden="true">ⓘ</span><span data-copy="about">عن المشروع</span></a>
     </nav>
   </div>
   <dialog class="nav-sheet" id="mobile-nav" aria-labelledby="menu-title">
@@ -391,6 +392,7 @@
       <a href="#students" data-route="students" data-copy="students">الطلاب</a>
       <a href="#workflow" data-route="workflow" data-copy="workflow">مسار الوكلاء</a>
       <a href="#followup" data-route="followup" data-copy="followup">المتابعة</a>
+      <a href="#about" data-route="about" data-copy="about">عن المشروع</a>
       <a href="n8n-flow.html" data-copy="workflowMap">شاهد مخطط n8n</a>
     </nav>
   </dialog>
@@ -650,6 +652,17 @@
         <ol class="roadmap-list" id="roadmap"></ol>
       </section>
     </section>
+    <div class="screen about-layout" id="screen-about" hidden>
+      <img src="academic-support.webp" alt="" width="1500" height="1000" loading="lazy">
+      <section aria-labelledby="about-usage">
+        <h2 id="about-usage" data-copy="aboutUsage">كيف يساعد المعلّم؟</h2>
+        <p data-copy="aboutDetails">يسجّل المعلّم علامات الرياضيات وأيام الحضور لكل طالب. تُظهر اللوحة التغيّر في النتائج وتقترح تمارين وجلسات دعم على مدى ثمانية أسابيع. يراجع المعلّم الاقتراحات ويختار ما يناسب الطالب، ثم يقارن نتائجه كل أسبوع.</p>
+        <div class="actions">
+          <a class="button" href="https://github.com/momenarman-max/EduMind-AI" data-copy="aboutRepository">كود المشروع على GitHub</a>
+          <a class="button subtle" href="n8n-flow.html" data-copy="workflowMap">شاهد مخطط n8n</a>
+        </div>
+      </section>
+    </div>
     <div id="announcement" class="sr-only" role="status"></div>
   </main>
   <script src="detection.js"></script>
@@ -660,6 +673,11 @@
       ar: {
         skip: 'انتقل إلى المحتوى', language: 'لغة الواجهة', navigation: 'أقسام اللوحة',
         demo: 'بيانات تجريبية', overview: 'نظرة عامة', workflow: 'مسار الوكلاء', followup: 'المتابعة',
+        about: 'عن المشروع',
+        aboutIntro: 'EduMind AI مشروع أكاديمي يساعد المعلّمين على اكتشاف تراجع الطلاب في الرياضيات مبكرًا ومتابعة أثر الدعم مع الوقت.',
+        aboutUsage: 'كيف يساعد المعلّم؟',
+        aboutDetails: 'يسجّل المعلّم علامات الرياضيات وأيام الحضور لكل طالب. تُظهر اللوحة التغيّر في النتائج وتقترح تمارين وجلسات دعم على مدى ثمانية أسابيع. يراجع المعلّم الاقتراحات ويختار ما يناسب الطالب، ثم يقارن نتائجه كل أسبوع.',
+        aboutRepository: 'كود المشروع على GitHub',
         coverHeading: "لوحة المعلّم لمتابعة تقدّم الطلاب",
         openWorkspace: "افتح لوحة المعلّم",
         closeDialog: "إغلاق النافذة",
@@ -802,6 +820,11 @@
         ]
       },
       en: {
+        about: 'About the project',
+        aboutIntro: 'EduMind AI is an academic project that helps teachers spot setbacks in mathematics early and see how students respond to support over time.',
+        aboutUsage: 'How does it help teachers?',
+        aboutDetails: 'Teachers record each student’s math scores and attendance. The dashboard shows what changed and suggests eight weeks of exercises and support sessions. Teachers review the suggestions, choose what fits each student, and compare results each week.',
+        aboutRepository: 'Project code on GitHub',
         skip: 'Skip to content', language: 'Interface language', navigation: 'Dashboard sections',
         demo: 'Demo data', overview: 'Overview', workflow: 'Agent workflow', followup: 'Follow-up',
         coverHeading: "Track your students’ progress",
@@ -946,6 +969,11 @@
         ]
       },
       uk: {
+        about: 'Про проєкт',
+        aboutIntro: 'EduMind AI — навчальний проєкт, який допомагає вчителям вчасно помічати зниження успішності з математики й оцінювати результати підтримки.',
+        aboutUsage: 'Як це допомагає вчителям?',
+        aboutDetails: 'Учителі вносять оцінки з математики й відвідуваність кожного учня. Панель показує зміни та пропонує вправи й заняття на вісім тижнів. Учителі обирають доречні рекомендації та щотижня порівнюють результати.',
+        aboutRepository: 'Код проєкту на GitHub',
         skip: 'Перейти до вмісту', language: 'Мова інтерфейсу', navigation: 'Розділи панелі',
         demo: 'Демонстраційні дані', overview: 'Огляд', workflow: 'Робота агентів', followup: 'Прогрес',
         coverHeading: "Відстежуйте прогрес учнів",
@@ -1584,7 +1612,7 @@
           }
         }
         screen = studentRoute ? 'students' : agentRoute ? 'workflow'
-          : ['students', 'followup', 'workflow'].includes(route) ? route : 'overview';
+          : ['students', 'followup', 'workflow', 'about'].includes(route) ? route : 'overview';
         if (agentRoute) selectedAgent = Number(agentRoute[1]) - 1;
         renderedRoute = hash;
         if (entryDialog.open && !addStudent) entryDialog.close();
